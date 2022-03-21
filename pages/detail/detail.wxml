@@ -1,0 +1,250 @@
+
+<import src="../../templates/copyright.wxml" />
+<import src="../../templates/loading.wxml" />
+<import src="../../templates/modal-view/modal-view.wxml" />
+<import src="../../templates/login-popup.wxml" />
+
+
+
+<view>
+<!-- 小程序广告 -->
+      <!-- <view class="ad-box" wx:if="{{detail.detailAdId !='' && detail.detailAd=='1' && detailTopAdsuccess}}">
+        <ad unit-id="{{detail.detailAdId}}" ad-intervals="30" ad-type="video" binderror="adTopbinderror"></ad>
+      </view> -->
+
+  <!-- 文章 -->
+  <view class="detail-content" style="display:{{display}}">
+    <!-- 标题 删除结尾的.rendered-->
+    <view class="entry-title">{{detail.title}}</view>
+    <!-- 文章互动数据 -->
+    <view class="entry-data">
+      <image src="../../images/calendar.png"></image>
+      <text>{{detailDate}}</text>
+      <image src="../../images/comments.png"></image>
+      <text>{{totalComments}}</text>
+      <image src="../../images/pageviews.png"></image>
+      <text>{{detail.pageviews}}</text>
+      <image src="../../images/home-like.png"></image>
+      <text>{{likeCount}}</text>
+    </view>
+    <!-- 文章正文 -->
+    <view class="entry-summary" id="entry-summary" style="height:{{detailSummaryHeight}}">       
+
+     <mp-html content="{{ detail.content }}" bindlinktap="wxParseTagATap" copy-link="{{false}}" selectable="{{true}}" lazy-load="{{true}}" markdown="{{true}}" />
+      <!-- 阅读更多 -->
+        <!-- <view class="detail-read-more" wx:if="{{detailSummaryHeight != ''}}">
+          <view class="detail-readmore-mask">
+            <view class="detail-readmore-btn" bindtap="readMore">观看视频，阅读更多...</view>
+          </view>
+        </view> -->
+
+    </view>
+
+    
+
+
+<!-- 添加9图模块 -->
+
+
+
+    <!--  上下文  -->
+    <!-- <view wx:if="{{detail.previous_post_id || detail.next_post_id}}" class="up-down-post"> -->
+      <!-- 上一篇 -->
+      <!-- <view wx:if="{{detail.previous_post_id}}" class="up-post">
+        <navigator url="../detail/detail?id={{detail.previous_post_id}}" open-type="redirect" hover-class="relatedNavigator">上一篇：{{detail.previous_post_title}}</navigator>
+      </view> -->
+      <!-- 下一篇 -->
+      <!-- <view wx:if="{{detail.next_post_id}}" class="down-post">
+        <navigator url="../detail/detail?id={{detail.next_post_id}}" open-type="redirect" hover-class="relatedNavigator">{{detail.next_post_title}}：下一篇</navigator>
+      </view> -->
+    <!-- </view> -->
+
+    <!-- 小程序广告 -->
+    <!-- <view class="ad-box-video" wx:if="{{detail.videoAdId !='' && detail.detailAd=='1' && detailAdsuccess}}">
+      <ad unit-id="{{detail.videoAdId}}" ad-intervals="30" ad-type="video" binderror="adbinderror"></ad>
+    </view> -->
+     
+
+    <!-- 猜你喜欢 -->
+    <!-- <view wx:if="{{postList.length != 0}}" class="relatedPost" style="display:{{display}}">
+      <view class="subTitle">猜你喜欢</view>
+      <view class="subTitle_line"></view>
+      <block wx:key="id" wx:for="{{postList}}">
+        <navigator url="../detail/detail?id={{item.id}}" open-type="redirect" hover-class="relatedNavigator">
+          <view class="relatedText">{{index+1}}. {{item.title.rendered}}</view>
+        </navigator>
+      </block>
+    </view> -->
+
+    <!-- 点个赞 -->
+    <view class="likePost" style="display:{{displayLike}}">
+      <view class="subTitle">点个赞？</view>
+      <view class="subTitle_line"></view>
+
+      <view class="likeTitle">
+        <text>{{likeCount}}人已赞</text>
+      </view>
+
+      <view class="like-btn-icon">
+        <image src="../../images/like-on.png" class="img-like" id="liketop" ></image>
+      </view>
+      <view class="likeText">
+        <block wx:key="id" wx:for="{{likeList}}">
+          <image src="{{item}}" class="like-gravatar"></image>
+        </block>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 评论列表 -->
+  <view style="display:{{display}}" class="comment-container">
+    <!-- 小标题 -->
+    <view class="subTitle" id="relatedTitle">
+      <view>评论交流</view>
+      <view class="comment-num">{{commentCount}}</view>
+    </view>
+    <view class="subTitle_line subTitle_line_comment"></view>
+
+    <!-- 列表 -->
+    <block wx:key="id" wx:for="{{commentsList}}">
+      <view class="comment">
+        <view class="comment-user">
+          <image src="{{item.avatarUrl}}" class="comment-gravatar"></image>
+          <view class="comment-user-right">
+          <!-- data-userid="{{item.userid}}" data-formId="{{item.formId}}" -->
+            <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}"  data-commentdate="{{item.fatherReplyDate}}">{{item.nickName}}</view>
+            <view class="time" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}"  data-commentdate="{{item.fatherReplyDate}}">{{item.fatherReplyDate}}</view>
+          </view>
+        </view>
+        <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.author_name}}" data-userid="{{item.userid}}" data-formId="{{item.formId}}" data-commentdate="{{item.date}}"> {{item.content}}</view>
+
+        <!-- 子回复-->
+        <view wx:for="{{item.sonList}}" wx:key="itemid1" wx:for-index="idx" wx:for-item="item1">
+          <view class="replay-user" bindtap="replay" data-id="{{item1.id}}" data-name="{{item1.nickName}}"   data-commentdate="{{item1.sonReplyDate}}">
+            <text class="comment-username">{{item1.nickName}}</text>
+            <text style="margin: 0 6rpx; color: #959595;">回复</text>
+            <text class="comment-username">{{item1.receiverNick}}</text> ：{{item1.content}}
+          </view>
+
+        </view>
+        <!-- 子回复-->
+
+      </view>
+    </block>
+
+
+    <view style="display:{{display}}">
+      <view style='display:{{isLoading?"block":"none"}}'>
+        <template is="tempLoading" />
+      </view>
+      <view style="display:{{isLastPage?'block':'none'}}">
+        <view class="no-more">- 无更多评论 -</view>
+      </view>
+    </view>
+    <!-- 提交评论为null弹出对话框模块 -->
+    <modal title="{{dialog.title}}" hidden="{{dialog.hidden}}" no-cancel bindconfirm="confirm">{{dialog.content}}</modal>
+  </view>
+  <template is="modalView" data="{{...__modalView__}}" />
+
+  <poster id="poster" hide-loading="{{false}}" preload="{{false}}" config="{{posterConfig}}" bind:success="onPosterSuccess" bind:fail="onPosterFail">
+  </poster>
+  <view class="ditail-copyright" style="display:{{display}}">
+    <template is="tempCopyright" data="{{blog:blog,webSiteName:webSiteName}}"/>
+  </view>
+
+  <template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
+
+  <!--评论区-->
+  <view style="display:{{enableComment?'block':'none'}}">
+    <view class="menuBackground" catchtap="hiddenMenubox" style="display:{{menuBackgroup ? 'block' : 'none'}}"></view>
+    <view style="display:{{display}}">
+
+      <view class="comment-fixed">
+
+        <form catchsubmit="formSubmit" report-submit="true">
+          <view class="comment-respond">
+            <input class="comment-input" maxlength="200" name="inputPostID" value="{{detail.id}}" style="display:none" />
+
+            <view class="comment-box">
+
+              <!-- 返回首页 -->
+              <image src="../../images/entry-home.png" class="comment_icon_home" catchtap="goHome"></image>
+
+              <!-- 评论输入框和发送按钮 -->
+              <view class="comment_input_box">
+                <input class="comment-input" type='text' confirm-type="send" cursor-spacing="10" maxlength="100" name="inputComment" value="{{content}}" placeholder="{{placeholder}}" focus="{{focus}}" bindblur="onReplyBlur" bindfocus="onRepleyFocus" />
+                <button class="comment-button touch-active" formType="submit">发送</button>
+              </view>
+              <!-- 更多按钮 -->
+              <!-- <image src="../../images/entry-more.png" class="comment_icon_more" catchtap="ShowHideMenu" mode=""></image> -->
+
+            </view>
+
+            <!--功能图标-->
+            <view class="menu-box {{isShow ? 'emoji-move-in' : 'emoji-move-out'}} {{isLoad ? 'no-emoji-move' : ''}}">
+              <view class="iconList">
+                <view class="iconLine">
+                  <view style="width:25%; position: relative; float:left; text-align:center">
+                    <view>
+                      <image src="../../images/forwarding.png" class="img-menu"></image>
+                    </view>
+                    <view>
+                      <text>转发</text>
+                    </view>
+                    <button class="share-button share-button touch-active" open-type="share">
+                    </button>
+                  </view>
+                  <view style="width:25%; float:left; text-align:center">
+                    <view>
+                      <image src="../../images/poster.png" catchtap="onCreatePoster" class="img-menu"></image>
+                    </view>
+                    <view>
+                      <text>海报</text>
+                    </view>
+                  </view>
+                  <!-- <view style="width:20%; float:left; text-align:center">
+                    <view>
+                      <image src="../../images/copy.png" class="img-menu" catchtap="gotowebpage"></image>
+                    </view>
+                    <view>
+                      <text>阅读原文</text>
+                    </view>
+                  </view> -->
+
+                  <view style="width:25%; float:left; text-align:center">
+                    <view>
+                      <image src="../../images/{{likeImag}}" catchtap="clickLike" id="likebottom" class="img-menu"></image>
+                    </view>
+                    <view>
+                      <text>点赞</text>
+                    </view>
+                  </view>
+                  <view style="width:25%; float:left; ">
+                    <view>
+                      <image src="../../images/appreciation.png" catchtap="praise" class="img-menu"></image>
+                    </view>
+                    <view>
+                      <text>喜欢</text>
+                    </view>
+
+                  </view>
+                </view>
+              </view>
+            </view>
+
+          </view>
+        </form>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- 无法访问网络时 [js:395]showerror: 'block'; -->
+  <view class="showerror" style="display:{{showerror}}">    
+    <image src="../../images/cry80.png" style="height:100rpx;width:100rpx"></image>
+    <!--  errMessage js页面data中没定义这个数据 -->
+    <view class="errortext">{{errMessage}}</view>
+  </view>
+
+</view>

@@ -1,0 +1,8 @@
+ 去除小程序广告：
+
+
+ pages/detail/detail.js 397：detailAdsuccess:false,    //false去广告，之前是true
+ pages/detail/detail.js 93：detailAdsuccess: false,    //小程序广告（已经修改为去广告）
+  pages/detail/detail.js 94： detailTopAdsuccess:false,    //去除顶部广告（false修改为去广告）
+
+

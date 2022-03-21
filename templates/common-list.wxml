@@ -1,0 +1,43 @@
+<template name="tempCommonList">
+
+  <view class="post-list">
+    <block wx:for="{{postsList}}" wx:key="id" >
+    <!-- 广告项 每7个文章投放一个广告 -->
+    <!-- index 计数列表第多少条   item 为列表其中一项元素  -->
+    <!-- <view class="list-item-ad" index="{{index}}" wx:if="{{index%item.listAdEvery ==0  && index!=0 && item.listAd =='1' && item.listAdId !=''  && listAdsuccess}}">
+    
+        <block wx:if="{{(index/item.listAdEvery)%2==0}}">
+        投放视频广告，出现概率大约是普通广告概率的1/2
+					<ad unit-id="{{item.videoAdId}}" ad-type="video" ad-theme="white" binderror="adbinderror"></ad>
+				</block>
+        <block wx:else>
+        投放普通广告，出现概率大概是每7个文章出现一次
+        <ad unit-id="{{item.listAdId}}" ad-intervals="30" binderror="adbinderror"></ad>
+        </block>
+      </view> -->
+
+      <!-- 帖子项 -->
+      <view class="post-item" index="{{index}}" id="{{item.id}}" bindtap="redictDetail">
+        <image src="{{item.postMediumImage}}" mode="aspectFill" class="post-img"></image>
+        <view class="post-desc">
+          <view class="post-title">
+          <!-- rendered 描述 -->
+            <text>{{item.title}}</text>
+          </view>
+          <view class="post-data">
+            <image src="../../images/calendar.png"></image>
+            <!-- item.date 发布日期   -->
+            <text>{{item.date}}</text>
+            <image src="../../images/comments.png"></image>
+            <text class="">{{item.totalComments}}</text>
+            <image src="../../images/home-like.png"></image>
+            <text class="">{{item.likeCount}}</text>
+            <image src="../../images/pageviews.png"></image>
+            <text class="">{{item.pageviews}}</text>
+          </view>
+        </view>
+      </view>
+
+    </block>
+  </view>
+</template>
