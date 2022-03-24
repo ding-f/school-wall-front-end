@@ -11,7 +11,7 @@ const Adapter = require('../../utils/adapter.js')
 var wxRequest = require('../../utils/wxRequest.js')
 
 import config from '../../utils/config.js'
-var pageCount = config.getPageCount;
+var pageCount = config.getPostCount;
 var webSiteName= config.getWebsiteName;
 var domain =config.getDomain
 

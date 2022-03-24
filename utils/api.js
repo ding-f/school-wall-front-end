@@ -2,7 +2,7 @@
 
 import config from 'config.js';
 var domain = config.getDomain;
-var pageCount = config.getPageCount;
+var pageCount = config.getPostCount;
 var categoriesID = config.getCategoriesID;
 
 var HOST_URI = 'http://' + domain+'/schoolwall/'; //   https://' + domain+'/wp-json/wp/v2/

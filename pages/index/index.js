@@ -10,7 +10,7 @@ var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js')
 import config from '../../utils/config.js'
 // const Adapter = require('../../utils/adapter.js') //文章列表间隙广告
-var pageCount = config.getPageCount;
+// var pageCount = config.getPostCount;
 
 var webSiteName = config.getWebsiteName;  //网站名称：安康学院校园墙
 var domain =config.getDomain; //网站域名：
@@ -118,6 +118,11 @@ Page({
       this.fetchPostsData(self.data);   //再次请求获取文章列表的API
     } else {
       console.log('最后一页');
+      wx.showToast({
+        title: '已加载全部墙帖',
+        mask: false,
+        duration: 1666
+      });
     }
 
   },
@@ -222,7 +227,7 @@ Page({
   // mark: 218 获取文章列表数据
   fetchPostsData: function (data) {
     var self = this;
-    //为什么定义这些数据：初始化数据，没加载时候定义data.page=1(页面数)
+    //下拉刷新if将不会执行赋值，以下没有下拉刷新才会执行
     if (!data) data = {};
     if (!data.page) data.page = 1;  //提交的页面数
     // if (!data.categories) data.categories = 0;
@@ -232,6 +237,7 @@ Page({
         postsList: []
       });
     };    
+    
     self.setData({ isLoading: true })
     
     // var getCategoriesRequest = wxRequest.getRequest(Api.getCategoriesIds());
@@ -249,14 +255,17 @@ Page({
         var getPostsRequest = wxRequest.getRequest(Api.getPosts(data));
         getPostsRequest
           .then(response => {
-            var pageData=response.data.records; //页面列表数据
-            var pagesNum=response.data.pages;   //所有页面数
-            var currentPage=response.data.current;  //当前第几页
+            var DATA=response.data;
 
-            //  console.log(response);
-            if (response.statusCode === 200) {
-              if (currentPage <= pagesNum) {   // *response.data请求的返回数据*    //判断如果有数据列表
-                if (pageData.lenght < pageCount) { //判断加载到了最后一页
+            var pageData=DATA.records; //单个页面列表
+            var dataLength= pageData.length;  //单个页面几个条目
+            
+
+            
+            //  console.log(dataLength);
+            if (response.errMsg === "request:ok") {
+              if (dataLength > 0) {   // *response.data请求的返回数据*    //判断如果有数据列表
+                if (dataLength < DATA.size) { //判断加载到了最后一页
                   self.setData({
                     isLastPage: true,
                     isLoading: false
@@ -285,24 +294,27 @@ Page({
                   
                 });
                 // console.log(postsList);
-              } else {  //如果无数据列表
-                if (currentPage > pagesNum) {
+              } else {  //上次刚刚好加载10个结束，这次还会加载这个函数
+                // console.log(dataLength);
+                
                   self.setData({
                     isLastPage: true,
                     isLoading: false
                   });
                   wx.showToast({
-                    title: '已加载全部动态',
+                    title: '已加载全部墙帖',
                     mask: false,
-                    duration: 3000
+                    duration: 1666
                   });
-                } else {
-                  wx.showToast({
-                    title: "服务器异常！！",
-                    duration: 1500
-                  })
-                }
+                
               }
+            }else{
+              //加载到本函数突然断网才会发生
+                wx.showToast({
+                  title: "请求异常！！",
+                  duration: 3333
+                })
+              
             }
           })
           // mark: 309 ---详情查看微信小程序网络教程---

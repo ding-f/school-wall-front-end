@@ -89,10 +89,11 @@
     <view style='display:{{isLoading?"block":"none"}}'>
         <template is="tempLoading" />
       </view>
+      
     <!-- 无更多文章提示 -->
     <view class="loadingmore" style="display:{{floatDisplay}}">
     
-      <view class="no-more" hidden="{{!isLastPage}}">- 嗷呜~没有更多帖子了 -</view>
+      <view class="no-more" hidden="{{!isLastPage}}">- 💝 给你了我的全部 💝 -</view>
     </view>
     <!-- 版权信息template模板 -->
     <view class="copyright">

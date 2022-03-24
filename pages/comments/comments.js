@@ -9,7 +9,7 @@ var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js')
 const Adapter = require('../../utils/adapter.js')
 import config from '../../utils/config.js'
-var pageCount = config.getPageCount;
+var pageCount = config.getPostCount;
 
 Page({
     data: {

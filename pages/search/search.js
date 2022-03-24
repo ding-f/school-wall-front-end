@@ -14,7 +14,7 @@ var util = require('../../utils/util.js');
 var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js')
 import config from '../../utils/config.js'
-var pageCount = config.getPageCount;
+var pageCount = config.getPostCount;
 var webSiteName= config.getWebsiteName;
 var domain =config.getDomain
 const app = getApp()

@@ -161,7 +161,7 @@
 .like-btn-icon {
   position: absolute;
   top: 120rpx;
-  left: 133rpx;
+  left: 140rpx;
 }
 
 .likeText {
@@ -449,7 +449,7 @@
   text-align: center;
   color: #999;
   margin-top: 20rpx;
-  margin-bottom: 120rpx;
+  margin-bottom: 300rpx;
 }
 
 .wxParse-a {
