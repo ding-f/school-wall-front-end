@@ -30,11 +30,13 @@ module.exports = {
     return url;
 
   },
+
   // 获取多个分类文章列表数据
   getPostsByCategories: function (categories) {
       var url = HOST_URI + 'posts?per_page=20&orderby=date&order=desc&page=1&categories=' + categories;
       return url;
   },
+  
   // 获取置顶的文章
   getStickyPosts: function () {
     var url = HOST_URI + 'posts?sticky=true&per_page=5&page=1';
@@ -50,7 +52,7 @@ module.exports = {
       return url;
   },
 
-  // mark: 获取是否开启评论的设置
+  // mark: 获取是否开启评论的设置(没用)
   // getEnableComment: function () {
   //     var url = HOST_URI;
   //     url += 'options/enableComment';
@@ -94,7 +96,7 @@ module.exports = {
 
   },
 
-   // mark: 获取帖子详细数据
+   // mark: 获取帖子详细数据（已实现）
   getPostByID: function (id) {
 
     // http://0.0.0.0:3000/schoolwall/posts/id={}
@@ -111,21 +113,25 @@ module.exports = {
   getPageByID: function (id, obj) {
     return HOST_URI + 'pages/' + id;
   },
-  //获取分类列表
+
+  // mark: 获取分类列表（未实现）
   getCategories: function (ids,openid) {
       var url ='';
       if (ids ==''){
-          
-          url = HOST_URI + 'categories?per_page=100&orderby=count&order=desc&openid='+openid;
+        //未登录获取墙贴分类
+        url = HOST_URI + 'categories'
+          // url = HOST_URI + 'categories?per_page=100&orderby=count&order=desc&openid='+openid;
       }
       else
       {
+        //登录获取墙贴分类并且显示点亮订阅按钮
           url = HOST_URI + 'categories?include=' + ids+'&orderby=count&order=desc&openid='+openid;
  
       }
    
     return url
   },
+
   //获取某个分类信息
   getCategoryByID: function (id) {
     var dd = HOST_URI + 'categories/' + id;
@@ -138,7 +144,7 @@ module.exports = {
   //   return url;
   // },
 
-  // mark: 获取文章评论及其回复
+  // mark: 获取文章评论及其回复（已实现）
   getCommentsReplay: function (obj) {
     //https://www.watch-life.net/wp-json/watch-life-net/v1/comment/getcomments?postid=1959&limit=10&page=1&order=desc
 
@@ -331,6 +337,8 @@ module.exports = {
       return url;
 
   },
+
+  // mark: 获取分类
   getCategoriesIds(){
     // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
     var url = HOST_URI;

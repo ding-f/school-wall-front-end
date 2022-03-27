@@ -9,9 +9,9 @@ var Auth = require('../../utils/auth.js');
 
 var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js');
-const Adapter = require('../../utils/adapter.js')
+// const Adapter = require('../../utils/adapter.js')
 var webSiteName= config.getWebsiteName;
-var domain =config.getDomain
+var blog =config.getBlog;
 var app = getApp();
 Page({
     data: {
@@ -21,16 +21,20 @@ Page({
         openid:"",
         userInfo:{},
         webSiteName:webSiteName,
-    domain:domain        
+        blog:blog,
+
+    subimg: "subscription.png"        
     },
+
+
     onLoad: function (options) {
-        Auth.setUserInfoData(this); 
-        Auth.checkLogin(this);
+        Auth.setUserInfoData(this);     //检查是否有登录信息
+        Auth.checkLogin(this);      //请求服务器验证Session是否过期
         wx.setNavigationBarTitle({
-            title: '专题'
+            title: '墙贴分类'
         });
 
-        wx.showShareMenu({
+        wx.showShareMenu({      //设置点击更多分享菜单
                   withShareTicket:true,
                   menus:['shareAppMessage','shareTimeline'],
                   success:function(e)
@@ -38,44 +42,54 @@ Page({
                     //console.log(e);
                   }
             })
-        Adapter.setInterstitialAd("enable_topic_interstitial_ad");
+        // Adapter.setInterstitialAd("enable_topic_interstitial_ad");
         this.fetchCategoriesData();
         
     },
+
     onShow:function(){            
 
     },
-    //获取分类列表
+
+    // mark: 获取分类列表方法
     fetchCategoriesData: function () {
         var self = this;        
         self.setData({
             categoriesList: []
         });
         //console.log(Api.getCategories());
-        var getCategoriesIdsRequest = wxRequest.getRequest(Api.getCategoriesIds());
-        getCategoriesIdsRequest.then(res=>{
+        // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
+
+        // mark: 订阅点亮（待实现）
+        // var getCategoriesIdsRequest = wxRequest.getRequest(Api.getCategoriesIds());     //请求获取分类列表API
+        // getCategoriesIdsRequest.then(res=>{
             
 
-            var ids="";
-            var openid= self.data.openid
-            if(!res.data.Ids=="")
-            {
-                ids=res.data.Ids;
-            }
+            var ids="";     //订阅功能的参数，根据ID点亮订阅按钮
+            var openid= self.data.openid;
+
+        //     if(!res.data.Ids=="")
+        //     {
+        //         ids=res.data.Ids;
+        //     }
             var getCategoriesRequest = wxRequest.getRequest(Api.getCategories(ids,openid));
                 getCategoriesRequest.then(response => {
+                    console.log(response)
                     if (response.statusCode === 200) {
                         self.setData({
                             floatDisplay: "block",
-                            categoriesList: self.data.categoriesList.concat(response.data.map(function (item) {
-                                if (typeof (item.category_thumbnail_image) == "undefined" || item.category_thumbnail_image == "") {
-                                    item.category_thumbnail_image = "../../images/website.png";
+                            categoriesList: self.data.categoriesList.concat(response.data.data.map(function (item) {
+                                if (item.categoryThumbnailImage == "") {
+                                    item.categoryThumbnailImage = "../../images/error.jpg";
                                 
                                 }
-                                // item.subimg = "subscription.png";
+                            
+                                
+                                 ;
                                 return item;
                             })),
                         });
+                        console.log(self.data.categoriesList)
                     }
                     else {
                         console.log(response);
@@ -96,9 +110,10 @@ Page({
                     }).finally(function () {
 
                     })
-        })
+        // })
         
     },
+
     onShareAppMessage: function () {
         return {
             title: '分享“' + config.getWebsiteName + '”的专题栏目.',
@@ -119,6 +134,8 @@ Page({
       
     }
   },    
+
+  // mark: 点击了订阅按钮
     postsub: function (e) {
         var self = this;
         if (!self.data.openid) {
@@ -237,11 +254,11 @@ Page({
 
     },
 
-    //跳转至某分类下的文章列表
+    // mark: 跳转至某分类下的文章列表
     redictIndex: function (e) {
         //console.log('查看某类别下的文章');  
         var id = e.currentTarget.dataset.id;
-        var name = e.currentTarget.dataset.item;
+        // var name = e.currentTarget.dataset.item;
         var url = '../list/list?categoryID=' + id;
         wx.navigateTo({
             url: url

@@ -398,15 +398,14 @@ Page({
 
         // console.log(res);
 
-
         // 设置页面标题：文章分类
-        if (res.data.categoryId) //"categoryId": "WordPress",   // mark: 405 （微信页面标签）
-        {
-          wx.setNavigationBarTitle({
-            // title: res.data.title.rendered
-            title: "无标题" //res.data.categoryId    // mark: 页面标签 、、、、、、、、
-          });
-        }
+        // if (res.data.categoryId) //"categoryId": "WordPress",   // mark: 405 （微信页面标签）
+        // {
+        //   wx.setNavigationBarTitle({
+        //     // title: res.data.title.rendered
+        //     title: res.data.title //res.data.categoryId    // mark: 页面标签 
+        //   });
+        // }
 
         //获取多少条评论
         if (response.data.totalComments != null && response.data.totalComments != '') {
@@ -861,7 +860,7 @@ Page({
   //   })
   // },
 
-  // mark: 获取评论、、、、、、、
+  // mark: 获取评论
   fetchCommentData: function () {
     var self = this;
     let args = {};
@@ -880,11 +879,11 @@ Page({
         var dataAll = response.data; //整块数据
         var setLength = dataAll.data.size; //后端设置每页多少评论
 
-        var fatherList = dataAll.data.records;
+        var resFatherList = dataAll.data.records;
 
         var sum = 0;
 
-        fatherList.forEach(
+        resFatherList.forEach(
           //index:数组元素索引 value:数组元素值 array：数组本身
           function (value, index, array) {
 
@@ -900,17 +899,41 @@ Page({
             });
           }
           if (sum != 0) {
+            var locaList=self.data.commentsList;
+
+            
+             // mark: 如果有被切开的子列表整合成一个
+            if(locaList[0] && resFatherList[0]){
+              var locaListLast = locaList.slice(-1)[0];    //复制出最后一个元素
+              var resListFirst= resFatherList.slice(0,1)[0];    //复制出第一个元素
+
+
+              
+              if(locaListLast.id === resListFirst.id){
+                var unionSon = resFatherList.shift().sonList;    //返回削去response子第一个父评论的子列表
+
+                var locaLastSon=locaListLast.sonList.concat(unionSon);
+
+                // console.log(locaLastSon);
+                // console.log(locaList);
+
+                locaList[locaList.length-1].sonList=locaLastSon;    
+              }
+
+            }
+          
             self.setData({
-              commentsList: [].concat(self.data.commentsList, fatherList)
+              commentsList: [].concat(locaList, resFatherList)
             });
-            console.log(self.data.commentsList);
+            // console.log(self.data.commentsList);
           }
 
         }
 
+        
       })
       .catch(response => {
-        console.log(dataAll.msg);
+        console.log(response);   //上面的语句执行失败才会执行这个
 
       }).finally(function () {
         self.setData({

@@ -20,6 +20,8 @@ Auth.checkSession=function(appPage,flag)
             
         }
     }
+
+    // mark: 请求服务器，检查Session是否过期
 Auth.checkLogin=function(appPage){
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');    
         wx.checkSession({
@@ -42,6 +44,9 @@ Auth.checkLogin=function(appPage){
               }
         })
     }
+
+
+    // mark: 用户登录行为处理
 Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
     {   
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');
@@ -309,9 +314,9 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     //     }
     }) 
 }
-Auth.setUserInfoData = function(appPage)
+Auth.setUserInfoData = function(appPage)        //传过来整个APP页面
 {    
-    if(!appPage.data.openid){
+    if(!appPage.data.openid){       //如果设置了微信用户唯一标识，就不用执行以下，如果没设置就会设置
           appPage.setData({
             userInfo: wx.getStorageSync('userInfo'),
             openid:wx.getStorageSync('openid'),

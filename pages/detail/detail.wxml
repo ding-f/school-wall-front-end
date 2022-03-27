@@ -140,7 +140,7 @@
         <template is="tempLoading" />
       </view>
       <view style="display:{{isLastPage?'block':'none'}}">
-        <view class="no-more">- 🌹 收集更多小可爱的回复中 🌹 -</view>
+        <view class="no-more">- 🌹 收集小可爱们的回复中 🌹 -</view>
       </view>
     </view>
     <!-- 提交评论为null弹出对话框模块 -->

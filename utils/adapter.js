@@ -10,7 +10,7 @@ function setInterstitialAd(pagetype) {
 
       var enableAd=false;
 
-       // mark: 13 获取各类广告的是否开启情况，1开启，0关闭
+       // mark: 13 请求各类广告的是否开启情况，1开启，0关闭
       var enable_index_interstitial_ad=res.data.enable_index_interstitial_ad;
       var enable_detail_interstitial_ad=res.data.enable_detail_interstitial_ad;
       var enable_topic_interstitial_ad=res.data.enable_topic_interstitial_ad;
@@ -82,7 +82,7 @@ function setInterstitialAd(pagetype) {
         }
         if(enableAd)    //如果设置项为true，也就是说获取的Api.getOptions()设置值为1，就会执行以下
         {
-          interstitialAd.show().catch((err) => {
+          interstitialAd.show().catch((err) => {    //调用在调用次代码的地方显示广告
             console.error(err)
           })
         }

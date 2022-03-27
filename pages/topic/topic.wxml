@@ -3,17 +3,25 @@
 
 <view class="topic-list clearfix">
   <block wx:key="id" wx:for="{{categoriesList}}">
-    <view class="list-item">
-      <view>
-        <image src="{{item.category_thumbnail_image}}" class="topic-img" data-item="{{item.name}}" data-id="{{item.id}}" bindtap="redictIndex" mode="aspectFill"></image>
+    <view class="list-item"  >
+      <view  >
+      
+        <image src="{{item.categoryThumbnailImage}}" class="topic-img" data-item="{{item.name}}" data-id="{{item.id}}" bindtap="redictIndex" mode="aspectFill" >
+        
+        </image>
       </view>
       <view class="topic-name-box" data-item="{{item.name}}" data-id="{{item.id}}" bindtap="redictIndex">
         <view class="topic-name">
           <text>{{item.name}}</text>
         </view>
         <view class="btn-box">
-          <image src="../../images/{{item.subimg}}" data-subflag="{{item.subflag}}" data-id="{{item.id}}" catchtap="postsub"></image>
+        <!-- data-subflag="{{item.subflag}}"  -->
+          <image src="../../images/{{subimg}}" data-id="{{item.id}}" catchtap="postsub"></image>
         </view>
+      </view>
+     
+      <view class="topic-conut" data-item="{{item.name}}" data-id="{{item.id}}">
+        <text >{{item.count}} 篇墙贴</text>
       </view>
       <view class="topic-brief" data-item="{{item.name}}" data-id="{{item.id}}">
         <text>{{item.description}}</text>
@@ -27,5 +35,5 @@
 
 <!-- 版权信息 -->
 <view class="copyright" style="display:{{floatDisplay}}">
-   <template is="tempCopyright" data="{{webSiteName:webSiteName,domain:domain}}"/>
+   <template is="tempCopyright" data="{{webSiteName:webSiteName,blog:blog}}"/>
 </view>
