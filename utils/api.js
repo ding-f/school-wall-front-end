@@ -8,36 +8,39 @@ var categoriesID = config.getCategoriesID;
 var HOST_URI = 'http://' + domain+'/schoolwall/'; //   https://' + domain+'/wp-json/wp/v2/
 // var HOST_URI = 'http://' + domain + '/schoolwall/'; //   https://' + domain + '/wp-json/watch-life-net/v1/
    //https://www.watch-life.net/wp-json/watch-life-net/v1/
-   //https://www.watch-life.net//wp-json/wp/v2/
+   //https://www.watch-life.net/wp-json/wp/v2/
 
 
 module.exports = {  
-  // mark: 66 获取文章列表数据(已实现)
+  // mark: 获取帖子列表数据(已实现)
   getPosts: function (obj) {
     // http://0.0.0.0:3000/schoolwall/posts/page={}
     // https://www.watch-life.net/wp-json/watch-life-net/v1/posts?per_page=10&orderby=date&order=desc&page=1
     //'per_page=' + pageCount   &orderby=date&order=desc
       var url = HOST_URI + 'posts/page=' + obj.page;
     
+      // mark: 根据分类ID查询ID下的帖子列表(已实现)
     if (obj.categories != 0) {
-      url += '&categories=' + obj.categories;
+      //https://www.watch-life.net/wp-json/watch-life-net/v1/posts?per_page=10&orderby=date&order=desc&page=1&categories=1
+      //http://0.0.0.0:3000/schoolwall/posts/page=2/categorieid=3
+      url += '/categorieid=' + obj.categories;
     }
 
     else if (obj.search != '') {
-      url += '&search=' + encodeURIComponent(obj.search);
+      url += '/search=' + encodeURIComponent(obj.search);
     }
         
     return url;
 
   },
 
-  // 获取多个分类文章列表数据
+  // 获取多个分类帖子列表数据
   getPostsByCategories: function (categories) {
       var url = HOST_URI + 'posts?per_page=20&orderby=date&order=desc&page=1&categories=' + categories;
       return url;
   },
   
-  // 获取置顶的文章
+  // 获取置顶的帖子
   getStickyPosts: function () {
     var url = HOST_URI + 'posts?sticky=true&per_page=5&page=1';
     return url;
@@ -45,7 +48,7 @@ module.exports = {
   },
  
   
-  //获取首页滑动文章
+  //获取首页滑动帖子
   getSwiperPosts: function () {
       var url = HOST_URI;
       url +='post/swipe';
@@ -69,7 +72,7 @@ module.exports = {
 
 
 
-  // 获取tag相关的文章列表
+  // 获取tag相关的帖子列表
   // getPostsByTags: function (id,tags) {
 
     
@@ -81,14 +84,14 @@ module.exports = {
   // },
 
 
-  // 获取特定id的文章列表
+  // 获取特定id的帖子列表
   getPostsByIDs: function (obj) {
     var url = HOST_URI + 'posts?include=' + obj;
 
     return url;
 
   },
-  // 获取特定slug的文章内容
+  // 获取特定slug的帖子内容
   getPostBySlug: function (obj) {
       var url = HOST_URI + 'posts?slug=' + obj;
 
@@ -114,13 +117,16 @@ module.exports = {
     return HOST_URI + 'pages/' + id;
   },
 
-  // mark: 获取分类列表（未实现）
+  // mark: 获取分类列表（部分实现）
   getCategories: function (ids,openid) {
       var url ='';
       if (ids ==''){
         //未登录获取墙贴分类
         url = HOST_URI + 'categories'
-          // url = HOST_URI + 'categories?per_page=100&orderby=count&order=desc&openid='+openid;
+
+        //http://0.0.0.0:3000/schoolwall/categories
+        //https://www.watch-life.net/wp-json/wp/v2/categories?per_page=100&orderby=count&order=desc&openid=
+        
       }
       else
       {
@@ -132,19 +138,21 @@ module.exports = {
     return url
   },
 
-  //获取某个分类信息
+  // mark: 根据ID获取某个分类信息(已实现)
   getCategoryByID: function (id) {
-    var dd = HOST_URI + 'categories/' + id;
-    return HOST_URI + 'categories/'+id;
+    //https://www.watch-life.net/wp-json/wp/v2/categories/1
+    //http://0.0.0.0:3000/schoolwall/getcategorie/id=1
+    var dd = HOST_URI + 'getcategorie/id=' + id;
+    return dd;
   },
-  //获取某文章评论
+  //获取某帖子评论
   // getComments: function (obj) {
     
   //   var url = HOST_URI + 'comments?per_page=100&orderby=date&order=asc&post=' + obj.postID + '&page=' + obj.page;
   //   return url;
   // },
 
-  // mark: 获取文章评论及其回复（已实现）
+  // mark: 获取帖子评论及其回复（已实现）
   getCommentsReplay: function (obj) {
     //https://www.watch-life.net/wp-json/watch-life-net/v1/comment/getcomments?postid=1959&limit=10&page=1&order=desc
 
@@ -187,7 +195,7 @@ module.exports = {
       return url + 'comment/get?openid=' + openid;
   },    
 
-  //获取文章的第一个图片地址,如果没有给出默认图片
+  //获取帖子的第一个图片地址,如果没有给出默认图片
   getContentFirstImage: function (content){
     var regex = /<img.*?src=[\'"](.*?)[\'"].*?>/i;
     var arrReg = regex.exec(content);
@@ -198,7 +206,7 @@ module.exports = {
     return src;  
   },
 
- //获取热点文章
+ //获取热点帖子
   getTopHotPosts(flag){      
       var url = HOST_URI;
       if(flag ==1)
@@ -219,7 +227,7 @@ module.exports = {
       return url;
   },
 
-  //更新文章浏览数
+  //更新帖子浏览数
   updatePageviews(id) {
       var url = HOST_URI;
       url += "post/addpageview/"+id;
@@ -340,6 +348,7 @@ module.exports = {
 
   // mark: 获取分类
   getCategoriesIds(){
+
     // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
     var url = HOST_URI;
       url += "category/ids";
@@ -358,6 +367,8 @@ module.exports = {
       return url;
 
   },
+
+  // mark: 轮播图，精选（已实现）
   get_homeconfig()
   {
     // http://0.0.0.0:3000/schoolwall/options/homeconfig

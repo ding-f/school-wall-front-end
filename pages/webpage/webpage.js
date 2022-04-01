@@ -1,14 +1,4 @@
-/*
- * 
- * 微慕小程序开源版
- * author: jianbo
- * organization: 微慕  www.minapper.com
- * github:    https://github.com/iamxjb/winxin-app-watch-life.net
- * 技术支持微信号：iamxjb
- * 开源协议：MIT
- *  *Copyright (c) 2017 https://www.minapper.com All rights reserved.
- * 
- */
+
 
 
 import config from '../../utils/config.js'
@@ -71,7 +61,7 @@ Page({
         url = 'pages/webpage/webpage?url=' + url;
         console.log(url);
         return {
-            title: '分享"' + config.getWebsiteName + '"的文章' + self.data.title,
+            title: '分享"' + config.getWebsiteName + '"的帖子' + self.data.title,
             path: url,
             success: function (res) {
                 // 转发成功

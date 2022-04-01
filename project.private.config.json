@@ -35,7 +35,7 @@
                 },
                 {
                     "id": -1,
-                    "name": "文章详情",
+                    "name": "帖子详情",
                     "pathName": "pages/detail/detail",
                     "query": "id=1553",
                     "scene": null

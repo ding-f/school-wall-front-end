@@ -53,7 +53,7 @@
 /* 共计墙贴 */
 
 .topic-conut {
-  font-size: 9px;
+  font-size: 10px;
   padding: 5rpx 0rpx;
   text-align: center;
   overflow: hidden;

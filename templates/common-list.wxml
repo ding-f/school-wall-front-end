@@ -2,7 +2,7 @@
 
   <view class="post-list">
     <block wx:for="{{postsList}}" wx:key="id" >
-    <!-- 广告项 每7个文章投放一个广告 -->
+    <!-- 广告项 每7个帖子投放一个广告 -->
     <!-- index 计数列表第多少条   item 为列表其中一项元素  -->
     <!-- <view class="list-item-ad" index="{{index}}" wx:if="{{index%item.listAdEvery ==0  && index!=0 && item.listAd =='1' && item.listAdId !=''  && listAdsuccess}}">
     
@@ -11,7 +11,7 @@
 					<ad unit-id="{{item.videoAdId}}" ad-type="video" ad-theme="white" binderror="adbinderror"></ad>
 				</block>
         <block wx:else>
-        投放普通广告，出现概率大概是每7个文章出现一次
+        投放普通广告，出现概率大概是每7个帖子出现一次
         <ad unit-id="{{item.listAdId}}" ad-intervals="30" binderror="adbinderror"></ad>
         </block>
       </view> -->

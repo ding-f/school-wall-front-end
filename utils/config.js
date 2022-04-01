@@ -5,8 +5,8 @@
 var DOMAIN = "0.0.0.0:3000";
 var BLOG = "https://ding-f.gitee.io/";  //私人博客
 var WEBSITENAME="安康学院校园墙";   //站名称
-var POSTCOUNT=10; //每页文章数目
-var REPLYCOUNT='5'; //文章回复数目
+var POSTCOUNT=10; //每页帖子数目
+var REPLYCOUNT='5'; //帖子回复数目
 
 //是否启用小程序扫描二维码登录网站  true 启用  false  不启用
 //未安装微慕登录插件不要启用

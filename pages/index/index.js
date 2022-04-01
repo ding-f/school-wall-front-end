@@ -9,7 +9,7 @@ var util = require('../../utils/util.js');
 var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js')
 import config from '../../utils/config.js'
-// const Adapter = require('../../utils/adapter.js') //文章列表间隙广告
+// const Adapter = require('../../utils/adapter.js') //帖子列表间隙广告
 // var pageCount = config.getPostCount;
 
 var webSiteName = config.getWebsiteName;  //网站名称：安康学院校园墙
@@ -19,7 +19,7 @@ var blog =config.getBlog; //我的博客
 
 Page({
   data: {
-    postsList: [],    //*文章列表数据*
+    postsList: [],    //*帖子列表数据*
     postsShowSwiperList: [],
     isLastPage: false,
     page: 1,
@@ -33,17 +33,18 @@ Page({
     webSiteName:webSiteName,
     domain:domain,
     blog:blog,
-    isFirst: true, // 是否第一次打开
+    isFirst: false, // 是否第一次打开
     isLoading: false,
     swipe_nav:[], //1.轮播图列表
     selected_nav:[] //精选数据列表
 
   },
 
-  //搜索条件处理
+  // mark: 搜索条件处理
   formSubmit: function (e) {
+    console.log(e);
     var url = '../list/list'
-    var key = '';
+    var key = '';   //搜索关键字
     if (e.currentTarget.id == "search-input") {
       key = e.detail.value;
     } else {
@@ -58,8 +59,8 @@ Page({
       })
     } else {
       wx.showModal({
-        title: '提示',
-        content: '请输入内容',
+        title: 'tips 💡',
+        content: '请输入你要发现的发现 🍀',
         showCancel: false,
       });
     }
@@ -115,11 +116,11 @@ Page({
         page: self.data.page + 1
       });
       console.log('当前页' + self.data.page);
-      this.fetchPostsData(self.data);   //再次请求获取文章列表的API
+      this.fetchPostsData(self.data);   //再次请求获取帖子列表的API
     } else {
       console.log('最后一页');
       wx.showToast({
-        title: '已加载全部墙帖',
+        title: '加载完毕 🎉',
         mask: false,
         duration: 1666
       });
@@ -137,7 +138,7 @@ Page({
                 //console.log(e);
               }
         })
-  // 设置页面标题：文章分类
+  // 设置页面标题：帖子分类
   wx.setNavigationBarTitle({
     title: webSiteName
   });
@@ -159,7 +160,7 @@ Page({
         self.setData({
           isFirst: false
         });
-      }, 5000)
+      }, 9000)
     }
 
     this.getHomeconfig();
@@ -224,7 +225,7 @@ Page({
   },  
 
   ////////////////////////////////////////////////////
-  // mark: 218 获取文章列表数据
+  // mark: 218 获取帖子列表数据
   fetchPostsData: function (data) {
     var self = this;
     //下拉刷新if将不会执行赋值，以下没有下拉刷新才会执行
@@ -251,7 +252,7 @@ Page({
 
 
 
-        // mark: 254 调用API获取文章列表数据
+        // mark: 254 调用API获取帖子列表数据
         var getPostsRequest = wxRequest.getRequest(Api.getPosts(data));
         getPostsRequest
           .then(response => {
@@ -273,7 +274,7 @@ Page({
                 }    
                 self.setData({
                   floatDisplay: "block",    
-                  postsList: self.data.postsList.concat(pageData.map(function (item) {   //concat()连接多个数组;map(Math.sqrt())映射数组的每个元素到内部函数进行计算 *设置文章列表*/
+                  postsList: self.data.postsList.concat(pageData.map(function (item) {   //concat()连接多个数组;map(Math.sqrt())映射数组的每个元素到内部函数进行计算 *设置帖子列表*/
                     
                     var strdate = item.date   //添加一个变量，为了暂时放置变量
                     if (item.category_name != null) {
@@ -302,7 +303,7 @@ Page({
                     isLoading: false
                   });
                   wx.showToast({
-                    title: '已加载全部墙帖',
+                    title: '没了别拉了 😂',
                     mask: false,
                     duration: 1666
                   });
@@ -329,7 +330,7 @@ Page({
             } else {    
               wx.showModal({
                 title: '请检查网络',
-                content: '加载数据失败,请重试~',
+                content: '我们之间最遥远的距离原来是断网~',
                 showCancel: false,
               });
               self.setData({
@@ -370,9 +371,9 @@ Page({
   // },
 
 
-  // mark: 358 跳转至查看文章详情
+  // mark: 358 跳转至查看帖子详情
   redictDetail: function (e) {
-    // console.log('查看文章');
+    // console.log('查看帖子');
     // console.log(e.currentTarget.id);
     var id = e.currentTarget.id,
       url = '../detail/detail?id=' + id;
@@ -414,7 +415,7 @@ Page({
     }
 
   },
-  // 跳转至查看小程序列表页面或文章详情页
+  // 跳转至查看小程序列表页面或帖子详情页
   redictAppDetail: function (e) {
     let { type, appid, url, path } = e.currentTarget.dataset
 
@@ -438,7 +439,7 @@ Page({
   },
   //返回首页
   redictHome: function (e) {
-    //console.log('查看某类别下的文章');  
+    //console.log('查看某类别下的帖子');  
     var id = e.currentTarget.dataset.id,
       url = '/pages/index/index';
     wx.switchTab({

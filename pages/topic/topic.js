@@ -74,7 +74,7 @@ Page({
         //     }
             var getCategoriesRequest = wxRequest.getRequest(Api.getCategories(ids,openid));
                 getCategoriesRequest.then(response => {
-                    console.log(response)
+                    // console.log(response)
                     if (response.statusCode === 200) {
                         self.setData({
                             floatDisplay: "block",
@@ -85,11 +85,11 @@ Page({
                                 }
                             
                                 
-                                 ;
+                                 
                                 return item;
                             })),
                         });
-                        console.log(self.data.categoriesList)
+                        // console.log(self.data.categoriesList)
                     }
                     else {
                         console.log(response);
@@ -254,9 +254,9 @@ Page({
 
     },
 
-    // mark: 跳转至某分类下的文章列表
+    // mark: 跳转至某分类下的帖子列表
     redictIndex: function (e) {
-        //console.log('查看某类别下的文章');  
+        //console.log('查看某类别下的帖子');  
         var id = e.currentTarget.dataset.id;
         // var name = e.currentTarget.dataset.item;
         var url = '../list/list?categoryID=' + id;

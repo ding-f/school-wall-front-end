@@ -12,11 +12,11 @@
         <ad unit-id="{{detail.detailAdId}}" ad-intervals="30" ad-type="video" binderror="adTopbinderror"></ad>
       </view> -->
 
-  <!-- 文章 -->
+  <!-- 帖子 -->
   <view class="detail-content" style="display:{{display}}">
     <!-- 标题 删除结尾的.rendered-->
     <view class="entry-title">{{detail.title}}</view>
-    <!-- 文章互动数据 -->
+    <!-- 帖子互动数据 -->
     <view class="entry-data">
       <image src="../../images/calendar.png"></image>
       <text>{{detailDate}}</text>
@@ -27,7 +27,7 @@
       <image src="../../images/home-like.png"></image>
       <text>{{likeCount}}</text>
     </view>
-    <!-- 文章正文 -->
+    <!-- 帖子正文 -->
     <view class="entry-summary" id="entry-summary" style="height:{{detailSummaryHeight}}">       
 
      <mp-html content="{{ detail.content }}" bindlinktap="wxParseTagATap" copy-link="{{false}}" selectable="{{true}}" lazy-load="{{true}}" markdown="{{true}}" />

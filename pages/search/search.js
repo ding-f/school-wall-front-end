@@ -1,11 +1,3 @@
-/*
- * 
- * 微慕小程序
- * author: jianbo
- * organization:  微慕 www.minapper.com 
- * 技术支持微信号：Jianbo
- * Copyright (c) 2018 https://www.minapper.com All rights reserved.
- */
 
 
 var Api = require('../../utils/api.js');
@@ -214,7 +206,7 @@ Page({
 //         }
 //     },
 
-    // 跳转至查看文章详情
+    // 跳转至查看帖子详情
     redictDetail: function (e) {
         Adapter.redictDetail(e,"post");
     },

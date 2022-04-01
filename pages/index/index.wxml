@@ -10,7 +10,7 @@
 
 <!-- 首次进入引导添加到“我的小程序” catchtap="shutAddMyMiniapp"（作用不明）  -->
 <view class="addMyMiniapp"  wx:if="{{isFirst}}" catchtap="shutAddMyMiniapp">
-  <view>点击加入我的小程序 ↑↑</view>
+  <view>点击加入我的小程序 ↑</view>
   <text>每时每刻获取"{{webSiteName}}"最新动态</text>
 </view>
 
@@ -74,7 +74,7 @@
     <!-- 搜索 -->
     <form catchsubmit="formSubmit" catchreset="formReset" id="search-form">
       <view class="search-box">
-        <input value="" id="search-input" name="input" confirm-type="search" class="search-input" placeholder="搜索你感兴趣的内容..." bindconfirm="formSubmit"></input>
+        <input value="" id="search-input" name="input" confirm-type="search" class="search-input" placeholder="搜索你感兴趣的内容🙈..." bindconfirm="formSubmit"></input>
         <button class="search-button" form-type="submit" size="mini" plain="true">
           <icon type="search" color="#959595" size="16" />
         </button>
@@ -82,7 +82,7 @@
     </form>
 
   </view>
-  <!-- 文章列表 -->
+  <!-- 帖子列表 -->
   <view class="container">
     <!-- 列表template模板 for 循环在其内部  去除： ,listAdsuccess:listAdsuccess-->
     <template is="tempCommonList" data="{{postsList:postsList}}" />
@@ -90,10 +90,10 @@
         <template is="tempLoading" />
       </view>
       
-    <!-- 无更多文章提示 -->
+    <!-- 无更多帖子提示 -->
     <view class="loadingmore" style="display:{{floatDisplay}}">
     
-      <view class="no-more" hidden="{{!isLastPage}}">- 💝 给你了我的全部 💝 -</view>
+      <view class="no-more" hidden="{{!isLastPage}}">- 💝 全都给你了 💝 -</view>
     </view>
     <!-- 版权信息template模板 -->
     <view class="copyright">

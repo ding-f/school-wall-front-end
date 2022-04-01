@@ -5,9 +5,7 @@
   <block wx:key="id" wx:for="{{categoriesList}}">
     <view class="list-item"  >
       <view  >
-      
         <image src="{{item.categoryThumbnailImage}}" class="topic-img" data-item="{{item.name}}" data-id="{{item.id}}" bindtap="redictIndex" mode="aspectFill" >
-        
         </image>
       </view>
       <view class="topic-name-box" data-item="{{item.name}}" data-id="{{item.id}}" bindtap="redictIndex">
@@ -19,7 +17,6 @@
           <image src="../../images/{{subimg}}" data-id="{{item.id}}" catchtap="postsub"></image>
         </view>
       </view>
-     
       <view class="topic-conut" data-item="{{item.name}}" data-id="{{item.id}}">
         <text >{{item.count}} 篇墙贴</text>
       </view>

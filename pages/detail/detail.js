@@ -7,7 +7,7 @@ var wxRequest = require('../../utils/wxRequest.js')
 // const Adapter = require('../../utils/adapter.js')    //获取广告设置
 
 const innerAudioContext = wx.createInnerAudioContext();
-// let ctx = wx.createCanvasContext('mycanvas');  
+//  let ctx = wx.createCanvasContext('mycanvas');  
 
 var app = getApp();
 let isFocusing = false
@@ -20,22 +20,22 @@ import {
   ModalView
 } from '../../templates/modal-view/modal-view.js'
 import Poster from '../../templates/components/wxa-plugin-canvas-poster/poster/poster';
-let rewardedVideoAd = null
+// let rewardedVideoAd = null
 
 
 
 
 Page({
   data: {
-    title: '文章内容', //微信内部数据调用浏览标签
+    title: '帖子内容', //微信内部数据调用浏览标签
     webSiteName: webSiteName,
-    detail: {}, //文章具体信息
+    detail: {}, //帖子具体信息
     commentsList: [],
     // ChildrenCommentsList: [],
     commentCount: '', //设置评论的数目
     detailDate: '',
     commentValue: '',
-    display: 'none', // 设置文章、猜你喜欢、评论、等css样式
+    display: 'none', // 设置帖子、猜你喜欢、评论、等css样式
     showerror: 'none', // 设置显示的css样式，error：block   默认：none
     page: 1,
     isLastPage: false,
@@ -44,7 +44,7 @@ Page({
     placeholder: "评论...",
     postID: null,
     scrollHeight: 0,
-    postList: [], //通过tags获取的文章列表
+    postList: [], //通过tags获取的帖子列表
     link: '',
     dialog: {
       title: '',
@@ -96,7 +96,7 @@ Page({
   // mark: 此处获取其他页面传过来的数据并后台准备数据的加载
   onLoad: function (options) {
     var self = this;
-    wx.showShareMenu({ // mark: 转发文章菜单
+    wx.showShareMenu({ // mark: 转发帖子菜单
       withShareTicket: true,
       menus: ['shareAppMessage', 'shareTimeline'],
       success: function (e) {
@@ -104,7 +104,7 @@ Page({
       }
     })
     // self.getEnableComment();     // mark: 获取设置是否开启评论
-    self.fetchDetailData(options.id); //获取文章详细数据
+    self.fetchDetailData(options.id); //获取帖子详细数据
     Auth.setUserInfoData(self); //给当前页设置用户信息
     Auth.checkLogin(self);
     // mark: 119 获取广告
@@ -120,17 +120,18 @@ Page({
     })
     new ModalView;
   },
-  onUnload: function () {
-    //卸载页面，清除计步器
-    clearInterval(this.data.durationIntval);
-    if (rewardedVideoAd && rewardedVideoAd.destroy) {
-      rewardedVideoAd.destroy()
-    }
-    innerAudioContext.destroy()
-    ctx = null;
+
+  // onUnload: function () {
+  //   //卸载页面，清除计步器
+  //   clearInterval(this.data.durationIntval);
+  //   if (rewardedVideoAd && rewardedVideoAd.destroy) {
+  //     rewardedVideoAd.destroy()   //退出页面时干掉视频广告
+  //   }
+  //   innerAudioContext.destroy()   //关闭页面音乐
+  //   // ctx = null;
 
 
-  },
+  // },
 
   // mark: 展示点赞
   showLikeImg: function () {
@@ -155,11 +156,11 @@ Page({
   },
 
 
-  // mark: 上拉触底时间，加载评论
+  // mark: 上拉触底事件，加载评论
   onReachBottom: function () {
     var self = this;
     if (!self.data.isLastPage) {
-      // console.log('当前页' + self.data.page);
+      console.log('当前评论页' + self.data.page);
       self.fetchCommentData();
       self.setData({
         page: self.data.page + 1,
@@ -171,11 +172,12 @@ Page({
         mask: false,
         duration: 1666
       });
+      console.log('最后一页评论');
     }
 
   },
 
-  // 首次加载评论，点击文章时调用
+  // 首次加载评论，点击帖子时调用
   fristOpenComment() {
     this.setData({
       page: 1, //评论进行分页处理
@@ -194,7 +196,7 @@ Page({
     this.ShowHideMenu();
     console.log(res);
     return {
-      title: '分享"' + webSiteName + '"的文章：' + this.data.detail.title.rendered,
+      title: '分享"' + webSiteName + '"的帖子：' + this.data.detail.title.rendered,
       path: 'pages/detail/detail?id=' + this.data.detail.id,
       imageUrl: this.data.detail.post_full_image,
       success: function (res) {
@@ -386,7 +388,7 @@ Page({
 
 
 
-  // mark: 根据文章ID获取文章内容
+  // mark: 根据帖子ID获取帖子内容
   fetchDetailData: function (id) {
     var self = this;
     var getPostDetailRequest = wxRequest.getRequest(Api.getPostByID(id));
@@ -398,7 +400,7 @@ Page({
 
         // console.log(res);
 
-        // 设置页面标题：文章分类
+        // 设置页面标题：帖子分类
         // if (res.data.categoryId) //"categoryId": "WordPress",   // mark: 405 （微信页面标签）
         // {
         //   wx.setNavigationBarTitle({
@@ -420,10 +422,10 @@ Page({
 
         // 调用API从本地缓存中获取阅读记录并记录
         var logs = wx.getStorageSync('readLogs') || []; //从前到后执行，ture时就会执行，false继续往后，直到执行成功返回结果
-        // 过滤重复值，如果里面有重复的文章ID直接过滤掉 // mark: 426 去除重复ID的文章
+        // 过滤重复值，如果里面有重复的帖子ID直接过滤掉 // mark: 426 去除重复ID的帖子
         if (logs.length > 0) {
           logs = logs.filter(function (log) {
-            return log[0] !== id; //id是传过来的文章ID
+            return log[0] !== id; //id是传过来的帖子ID
           });
         }
         // 如果超过指定数量
@@ -439,7 +441,7 @@ Page({
         //   openAded = false; // mark: 442 去除设置广告，设置为false（不显示广告）
         // } else if (openAdLogs.length > 0 && res.data.excitationAd == '1') {    // mark: 443 是否开启广告日志 1 开启
         //   for (var i = 0; i < openAdLogs.length; i++) {
-        //     if (openAdLogs[i].id == res.data.id) {  //一个文章包含一个广告，如果找到设置的openAdLogs[i].id == res.data.id那就会设置这条广告
+        //     if (openAdLogs[i].id == res.data.id) {  //一个帖子包含一个广告，如果找到设置的openAdLogs[i].id == res.data.id那就会设置这条广告
         //       openAded = false;    // mark: 446 去除设置广告，设置为false（不显示广告）
         //       break;
         //     }
@@ -448,20 +450,20 @@ Page({
         //   }
         // }
 
-        // if (res.data.excitationAd == '1') {   // 1代表： 一篇文章设置了激励广告
+        // if (res.data.excitationAd == '1') {   // 1代表： 一篇帖子设置了激励广告
         //   self.loadInterstitialAd(res.data.rewardedVideoAdId);     // mark: 455 设置视频广告rewardedVideoAdId
         // }
 
         self.setData({
-          detail: response.data, //设置文章所有信息
+          detail: response.data, //设置帖子所有信息
           likeCount: _likeCount, //设置点赞数
-          postID: id, //设置文章Id
-          // link: response.data.link, //设置文章链接（无数据项）
-          detailDate: util.cutstr(response.data.date, 10, 1), //文章的发布时间，只裁剪到年月日
+          postID: id, //设置帖子Id
+          // link: response.data.link, //设置帖子链接（无数据项）
+          detailDate: util.cutstr(response.data.date, 10, 1), //帖子的发布时间，只裁剪到年月日
           display: 'block',
           displayLike: _displayLike, // mark: 465 如果有喜欢数，把喜欢数设置出显示效果
           totalComments: response.data.totalComments, //设置评论总数
-          // postImageUrl: response.data.postImageUrl,     //设置文章主题图片（无效数据）
+          // postImageUrl: response.data.postImageUrl,     //设置帖子主题图片（无效数据）
           // detailSummaryHeight: openAded ? '' : '400rpx'   //设置广告高度
 
         });
@@ -483,14 +485,14 @@ Page({
 
       // })
       // .then(response => {
-      //   // mark: 489 设置文章标签
+      //   // mark: 489 设置帖子标签
       //   var tagsArr = [];
-      //   tagsArr = res.data.tags   //此处的文章标签是一个数组
+      //   tagsArr = res.data.tags   //此处的帖子标签是一个数组
       //   if (!tagsArr) {
       //     return false;
       //   }
       //   var tags = "";
-      //   for (var i = 0; i < tagsArr.length; i++) {  //本文章有tags就设置tags
+      //   for (var i = 0; i < tagsArr.length; i++) {  //本帖子有tags就设置tags
       //     if (i == 0) {
       //       tags += tagsArr[i];
       //     }
@@ -499,12 +501,12 @@ Page({
       //     }
       //   }
       //   if (tags != "") {
-      //     // mark: 505 通过tages获取文章列表
+      //     // mark: 505 通过tages获取帖子列表
       //     var getPostTagsRequest = wxRequest.getRequest(Api.getPostsByTags(id, tags));
       //     getPostTagsRequest
       //       .then(response => {
       //         self.setData({
-      //           postList: response.data    // mark: 510 获取到文章列表
+      //           postList: response.data    // mark: 510 获取到帖子列表
       //         });
       //       })
       //   }
@@ -669,7 +671,7 @@ Page({
     }
   },
 
-  //给a标签添加跳转和复制链接事件 // mark: 678 解析文章内容的a标签 只有wxml内部属性bindlinktap="wxParseTagATap" 调用
+  //给a标签添加跳转和复制链接事件 // mark: 678 解析帖子内容的a标签 只有wxml内部属性bindlinktap="wxParseTagATap" 调用
   wxParseTagATap: function (e) {
     // e是传递过来的整个a链接
     let self = this
@@ -711,7 +713,7 @@ Page({
     }
 
 
-    var enterpriseMinapp = self.data.detail.enterpriseMinapp; //文章中的enterpriseMinapp字段是1就是本博客企业小程序
+    var enterpriseMinapp = self.data.detail.enterpriseMinapp; //帖子中的enterpriseMinapp字段是1就是本博客企业小程序
 
     //可以在这里进行一些路由处理
     if (href.indexOf(domain) == -1) { //如果域名不含有本站后端域名，比如0.0.0.0：80
@@ -765,8 +767,8 @@ Page({
         wx.switchTab({
           url: '../index/index'
         })
-      } else { // mark: 780 a链接是本站后端域名且包含本站文章地址
-        ///////获取文章通过slug
+      } else { // mark: 780 a链接是本站后端域名且包含本站帖子地址
+        ///////获取帖子通过slug
         var getPostSlugRequest = wxRequest.getRequest(Api.getPostBySlug(slug));
         getPostSlugRequest
           .then(res => {
@@ -785,16 +787,16 @@ Page({
                   openLinkCount++;
                   wx.setStorageSync('openLinkCount', openLinkCount);
                 }
-              } else { //本站文章不存在
+              } else { //本站帖子不存在
 
                 var url = '../webpage/webpage'
-                if (enterpriseMinapp == "1") { //如果是文章不存在且是本程序企业APP文章直接跳转
+                if (enterpriseMinapp == "1") { //如果是帖子不存在且是本程序企业APP帖子直接跳转
                   url = '../webpage/webpage';
                   wx.navigateTo({
                     url: url + '?url=' + href
                   })
                 } else {
-                  self.copyLink(href); //普通文章不存在，直接复制
+                  self.copyLink(href); //普通帖子不存在，直接复制
                 }
 
 
@@ -901,8 +903,7 @@ Page({
           if (sum != 0) {
             var locaList=self.data.commentsList;
 
-            
-             // mark: 如果有被切开的子列表整合成一个
+             // mark: 评论列表的合成
             if(locaList[0] && resFatherList[0]){
               var locaListLast = locaList.slice(-1)[0];    //复制出最后一个元素
               var resListFirst= resFatherList.slice(0,1)[0];    //复制出第一个元素
@@ -1213,7 +1214,7 @@ Page({
     })
   },
 
-  // mark: 1182 创建文章海报
+  // mark: 1182 创建帖子海报
   creatArticlePoster: function (appPage, api, util, modalView, poster) {
     var postId = appPage.data.detail.id;
     var title = appPage.data.detail.title.rendered;
@@ -1232,7 +1233,7 @@ Page({
     var postImageUrl = appPage.data.detail.post_full_image;
 
 
-    //获取文章首图临时地址，若没有就用默认的图片,如果图片不是request域名，使用本地图片
+    //获取帖子首图临时地址，若没有就用默认的图片,如果图片不是request域名，使用本地图片
     if (postImageUrl) {
       var n = 0;
       for (var i = 0; i < downloadFileDomain.length; i++) {
@@ -1255,7 +1256,7 @@ Page({
     if (!postImageUrl) {
 
       wx.showToast({
-        title: '文章没有图片且插件未设置默认海报封面图',
+        title: '帖子没有图片且插件未设置默认海报封面图',
         icon: 'none',
         duration: 3000,
         success: function () {}
@@ -1304,7 +1305,7 @@ Page({
         x: 32,
         y: 113,
         baseLine: 'top',
-        text: '发现不错的文章推荐给你',
+        text: '发现不错的帖子推荐给你',
         fontSize: 38,
         color: '#080808',
       },
@@ -1440,7 +1441,7 @@ Page({
   //     // 1395 mark: 加载设置帖子广告
   //     rewardedVideoAd.onClose((res) => {    //这个res应该是广告的res
 
-  //       var id = self.data.detail.id;   //本文章的ID
+  //       var id = self.data.detail.id;   //本帖子的ID
   //       if (res && res.isEnded) {   //res加载到&&未加载到但已加载结束
 
   //         var nowDate = new Date();
@@ -1456,7 +1457,7 @@ Page({
   //         // 如果超过指定数量不再记录
   //         if (openAdLogs.length < 21) {   //最大广告数量为21
   //           var log = {
-  //             "id": id,   //为某些文章ID设置广告
+  //             "id": id,   //为某些帖子ID设置广告
   //             "date": nowDate
   //           }
   //           openAdLogs.unshift(log);    //设置进数组

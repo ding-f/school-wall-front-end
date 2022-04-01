@@ -1,13 +1,4 @@
-/*
- * 
- * 微慕小程序开源版
- * author: jianbo
- * organization: 微慕  www.minapper.com
- * github:    https://github.com/iamxjb/winxin-app-watch-life.net
- * 技术支持微信号：iamxjb
- * 开源协议：MIT
- * 
- */
+
 
 @import "../../templates/modal-view/modal-view.wxss";
 
@@ -17,7 +8,7 @@
   margin: 40rpx 0;
 }
 
-/* 文章正文样式 */
+/* 帖子正文样式 */
 
 .entry-summary {
   font-size: 32rpx;
@@ -42,7 +33,7 @@
   margin-bottom: 24rpx;
 }
 
-/* 文章互动数据 */
+/* 帖子互动数据 */
 
 .entry-data {
   display: flex;

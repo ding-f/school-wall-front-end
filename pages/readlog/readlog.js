@@ -138,9 +138,9 @@ Page({
 
   },
 
-  // 跳转至查看文章详情
+  // 跳转至查看帖子详情
   redictDetail: function (e) {
-    // console.log('查看文章');
+    // console.log('查看帖子');
     var id = e.currentTarget.id;
     var itemtype = e.currentTarget.dataset.itemtype;
     var url ="";
@@ -182,7 +182,7 @@ Page({
       }
   },
   onShareAppMessage: function () {
-      var title = "分享我在“" + config.getWebsiteName + "浏览、评论、点赞、鼓励的文章";
+      var title = "分享我在“" + config.getWebsiteName + "浏览、评论、点赞、鼓励的帖子";
       var path = "pages/readlog/readlog";
       return {
           title: title,

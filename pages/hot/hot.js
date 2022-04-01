@@ -17,7 +17,7 @@ import config from '../../utils/config.js'
 
 Page({
   data: {
-    title: '文章列表',
+    title: '帖子列表',
     postsList: {},
     pagesList: {},
     categoriesList: {},
@@ -57,7 +57,7 @@ Page({
     })
   },
   onShareAppMessage: function () {
-    var title = "分享“"+ webSiteName +"”的文章排行。";
+    var title = "分享“"+ webSiteName +"”的帖子排行。";
     var path ="pages/hot/hot";
     return {
       title: title,
@@ -73,7 +73,7 @@ Page({
    // 自定义分享朋友圈
    onShareTimeline: function() {   
     return {
-      title:  "“"+ webSiteName +"”的文章排行",
+      title:  "“"+ webSiteName +"”的帖子排行",
       path: 'pages/hot/hot' ,
       
     }
@@ -122,7 +122,7 @@ Page({
     Adapter.setInterstitialAd("enable_hot_interstitial_ad");
         
   },
-  //获取文章列表数据
+  //获取帖子列表数据
   fetchPostsData: function (tab) {
     var self = this;  
     self.setData({
@@ -188,9 +188,9 @@ Page({
 
         });    
   }, 
-  // 跳转至查看文章详情
+  // 跳转至查看帖子详情
   redictDetail: function (e) {
-    // console.log('查看文章');
+    // console.log('查看帖子');
     var id = e.currentTarget.id,
       url = '../detail/detail?id=' + id;
     wx.navigateTo({

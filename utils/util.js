@@ -1,13 +1,4 @@
-/*
- * 
- * 微慕小程序开源版
- * author: jianbo
- * organization: 微慕  www.minapper.com
- * github:    https://github.com/iamxjb/winxin-app-watch-life.net
- * 技术支持微信号：iamxjb
- * 开源协议：MIT
- * Copyright (c) 2017  微慕 https://www.minapper.com All rights reserved.
- */
+
 
 function formatTime(date) {
   var year = date.getFullYear()
@@ -236,7 +227,7 @@ function getymd(dateStr, type) {
     }
 }
 
-//绘制文字：文章题目、摘要、扫码阅读
+//绘制文字：帖子题目、摘要、扫码阅读
 function drawTitleExcerpt(context, title, excerpt) {
 
     context.setFillStyle("#000000");

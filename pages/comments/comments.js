@@ -66,7 +66,7 @@ Page({
         Adapter.setInterstitialAd("enable_comments_interstitial_ad");
         self.fetchCommentsData();
     },
-    //获取文章列表数据
+    //获取帖子列表数据
     fetchCommentsData: function () {
         var self = this;
         wx.showLoading({
@@ -107,9 +107,9 @@ Page({
                 wx.hideLoading();
             })
     },
-    // 跳转至查看文章详情
+    // 跳转至查看帖子详情
     redictDetail: function (e) {
-        // console.log('查看文章');
+        // console.log('查看帖子');
         var id = e.currentTarget.id,
             url = '../detail/detail?id=' + id;
         wx.navigateTo({

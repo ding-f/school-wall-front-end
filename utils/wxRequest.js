@@ -1,14 +1,4 @@
-/*
- * 
- * 微慕小程序开源版
- * author: jianbo
- * organization: 微慕  www.minapper.com
- * github:    https://github.com/iamxjb/winxin-app-watch-life.net
- * 技术支持微信号：iamxjb
- * 开源协议：MIT
- *  *Copyright (c) 2017 https://www.minapper.com All rights reserved.
- * 
- */
+
 function wxPromisify(fn) {
     return function (obj = {}) {
         return new Promise((resolve, reject) => {       //异步任务的实现方式，需要建立一个Promise 详见《菜鸟教程》JS基础教程

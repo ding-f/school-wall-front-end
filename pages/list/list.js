@@ -6,26 +6,26 @@
 var Api = require('../../utils/api.js');
 var util = require('../../utils/util.js');
 
-var wxApi = require('../../utils/wxApi.js')
-const Adapter = require('../../utils/adapter.js')
+// var wxApi = require('../../utils/wxApi.js')
+// const Adapter = require('../../utils/adapter.js')
 var wxRequest = require('../../utils/wxRequest.js')
 
 import config from '../../utils/config.js'
-var pageCount = config.getPostCount;
+// var pageCount = config.getPostCount;
 var webSiteName= config.getWebsiteName;
-var domain =config.getDomain
+var blog =config.getBlog;
 
 Page({
   data: {
-    title: '文章列表',
-    postsList: {},
+    title: '帖子列表',
+    postsList: [],
     pagesList: {},
     categoriesList: {},
     postsShowSwiperList: {},
     isLastPage: false,
     page: 1,
     search: '',
-    categories: 0,
+    categories: 0,    //这个就是分类ID，写的跟个狗屎一样
     categoriesName:'',
     categoriesImage:"", 
     showerror:"none",
@@ -36,10 +36,12 @@ Page({
     floatDisplay: "none",
     searchKey:"",
     webSiteName:webSiteName,
-    domain:domain,
-    listAdsuccess:true,
+    blog:blog,
+    // listAdsuccess:true,
     isLoading: false
   },
+
+  //似乎没用
   formSubmit: function (e) {
     var url = '../list/list'
     if (e.detail.value.input != '') {
@@ -49,12 +51,13 @@ Page({
       url: url
     })
   },
+
   onShareAppMessage: function () {
     var title = "分享“"+webSiteName+"”";
     var path =""
     if (this.data.categories && this.data.categories != 0)
   {
-      title += "的专题：" + this.data.categoriesList.name;
+      title += "墙贴类别：" + this.data.categoriesList.name;
       path = 'pages/list/list?categoryID=' + this.data.categoriesList.id;
 
   }
@@ -76,9 +79,9 @@ Page({
       }
     }
   },
+//分享到朋友圈
   onShareTimeline: function() {
 
-    var path =""
     var query={};
     var title="";
     if (this.data.categories && this.data.categories != 0)
@@ -101,6 +104,7 @@ Page({
      
     }
   },
+  // mark: 上拉刷新
   onReachBottom: function () {
       var self = this;
       if (!self.data.isLastPage) {
@@ -111,10 +115,17 @@ Page({
           this.fetchPostsData(self.data);
       }
       else {
+
           console.log('最后一页');
+          wx.showToast({
+            title: '加载完毕 🎉',
+            mask: false,
+            duration: 1666
+          });
       }
      
   },
+ // mark: 重载按钮
   reload:function(e)
   {
     var self = this;
@@ -138,7 +149,7 @@ Page({
     }
     self.fetchPostsData(self.data);
   },
-  //加载分页
+  //加载分页，似乎没用
   loadMore: function (e) {
     var self = this;
     if (!self.data.isLastPage) {
@@ -150,12 +161,14 @@ Page({
     }
     else {
       wx.showToast({
-        title: '没有更多内容',
+        title: '加载完毕 🎉',
         mask: false,
         duration: 1000
       });
     }
   },
+
+  
   onLoad: function (options) {
     var self = this;
     wx.showShareMenu({
@@ -167,15 +180,19 @@ Page({
             }
       })
     // 设置插屏广告
-    Adapter.setInterstitialAd("enable_list_interstitial_ad");
+    // Adapter.setInterstitialAd("enable_list_interstitial_ad");
+
+    // mark: 获取分类ID调用查询分类帖子函数
     if (options.categoryID && options.categoryID != 0) {
       self.setData({
-        categories: options.categoryID,
+        categories: options.categoryID,    // mark: categories 即 categoryID传过来的分类ID
         isCategoryPage:"block"        
        
       });
       self.fetchCategoriesData(options.categoryID);
     }
+
+    // mark: 搜索功能实现
     if (options.search && options.search != '') {
       wx.setNavigationBarTitle({
         title: "搜索"
@@ -191,13 +208,15 @@ Page({
     
     }    
   },
-  //获取文章列表数据
-  fetchPostsData: function (data) {
+
+  // mark: 根据某分类数据查询所有某分类下的所有帖子
+  fetchPostsData: function (data) {   //data 传过来的是本页data数据
     var self = this;  
     if (!data) data = {};
     if (!data.page) data.page = 1;
     if (!data.categories) data.categories = 0;
     if (!data.search) data.search = '';
+
     if (data.page === 1) {
       self.setData({
         postsList: []
@@ -207,32 +226,30 @@ Page({
     var getPostsRequest = wxRequest.getRequest(Api.getPosts(data));
     getPostsRequest.then(response =>{
 
+      var pageList=response.data.records;   //单个分页页面列表
+      var pageSize=response.data.size;    //后端设置的列表每页多少元素
         if (response.statusCode === 200) {
-            if (response.data.length < pageCount) {
+            if (pageList.length < pageSize) {   //判断最后一页
                 self.setData({
                     isLastPage: true,
                     isLoading: false
                 });
-            };
+            }
+            
             self.setData({
                 floatDisplay: "block",
                 showallDisplay: "block",
-                postsList: self.data.postsList.concat(response.data.map(function (item) {
-                    var strdate = item.date
-                    if (item.category_name != null) {
+                postsList: self.data.postsList.concat(pageList.map(function (item) {
+                    var strdate = item.date;
+                    
 
-                        item.categoryImage = "../../images/topic.png";
-                    }
-                    else {
-                        item.categoryImage = "";
+                    if (item.postMediumImage == null || item.postMediumImage == '') {
+                        item.postMediumImage = '../../images/error.jpg';
                     }
 
-                    if (item.post_medium_image == null || item.post_medium_image == '') {
-                        item.post_medium_image = '../../images/logo700.png';
-                    }
                     item.date = util.cutstr(strdate, 10, 1);
                     return item;
-                })),
+                }))
 
             });
             // setTimeout(function () {
@@ -243,7 +260,7 @@ Page({
 
 
         }
-        else {
+        else {    // mark: 似乎是无用代码 
             if (response.data.code == "rest_post_invalid_page_number") {
 
                 self.setData({
@@ -264,6 +281,7 @@ Page({
     .catch(function(){        
         if (data.page == 1) {
 
+          // console.log("请求失败~~~~~~~~~~~~~~~");
             self.setData({
                 showerror: "block",
                 floatDisplay: "none"
@@ -273,7 +291,7 @@ Page({
         else {
             wx.showModal({
                 title: '加载失败',
-                content: '加载数据失败,请重试.',
+                content: '我们之间最遥远的距离原来是断网~~',
                 showCancel: false,
             });
 
@@ -293,9 +311,9 @@ Page({
 
 
 
-  // 跳转至查看文章详情
+  // 跳转至查看帖子详情
   redictDetail: function (e) {
-    // console.log('查看文章');
+    // console.log('查看帖子');
     var id = e.currentTarget.id,
       url = '../detail/detail?id=' + id;
     wx.navigateTo({
@@ -303,7 +321,7 @@ Page({
     })
   },
 
-  //获取分类列表
+  // mark: 分类ID获取某个分类的函数
   fetchCategoriesData: function (id) {
     var self = this;
     self.setData({
@@ -315,20 +333,20 @@ Page({
     getCategoryRequest.then(response =>{
 
         var catImage = "";
-        if (typeof (response.data.category_thumbnail_image) == "undefined" || response.data.category_thumbnail_image == "") {
-            catImage = "../../images/website.png";
+        if (typeof (response.data.categoryThumbnailImage) == "undefined" || response.data.categoryThumbnailImage == "") {
+            catImage = "../../images/error.jpg";
         }
         else {
-            catImage = response.data.category_thumbnail_image;
+            catImage = response.data.categoryThumbnailImage;
         }
 
         self.setData({
-            categoriesList: response.data,
-            categoriesImage: catImage,
-            categoriesName: response.data.name
+            categoriesList: response.data,    //分类的某个模块全部数据
+            categoriesImage: catImage,    //分类模块图片
+            categoriesName: response.data.name  //分类名称
         });
 
-        wx.setNavigationBarTitle({
+        wx.setNavigationBarTitle({    //标题栏 文字
             title: response.data.name,
             success: function (res) {
                 // success
@@ -338,19 +356,20 @@ Page({
         self.fetchPostsData(self.data); 
 
     })
-  },
-  adbinderror:function(e)
-  {
-    var self=this;
-    console.log(e.detail.errCode);
-    console.log(e.detail.errMsg);    
-    if (e.detail.errCode) {
-      self.setData({
-        listAdsuccess: false
-      })
-    }
-
   }
+  //,
+  // adbinderror:function(e)
+  // {
+  //   var self=this;
+  //   console.log(e.detail.errCode);
+  //   console.log(e.detail.errMsg);    
+  //   if (e.detail.errCode) {
+  //     self.setData({
+  //       listAdsuccess: false
+  //     })
+  //   }
+
+  // }
   
 
 })
