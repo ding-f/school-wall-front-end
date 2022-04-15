@@ -93,7 +93,7 @@
     <!-- 无更多帖子提示 -->
     <view class="loadingmore" style="display:{{floatDisplay}}">
     
-      <view class="no-more" hidden="{{!isLastPage}}">- 💝 全都给你了 💝 -</view>
+      <view class="no-more" hidden="{{!isLastPage}}">- 💝 口袋空空 💝 -</view>
     </view>
     <!-- 版权信息template模板 -->
     <view class="copyright">

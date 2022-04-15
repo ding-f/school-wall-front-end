@@ -46,7 +46,7 @@
       </view>
 
     <view class="loadingmore" style="display:{{floatDisplay}}">
-      <view class="no-more" hidden="{{!isLastPage}}">- 💝 全都给你了 💝 -</view>
+      <view class="no-more" hidden="{{!isLastPage}}">- 💝 口袋空空 💝 -</view>
     </view>
 
   </view>

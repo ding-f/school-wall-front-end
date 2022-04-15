@@ -10,7 +10,7 @@ const innerAudioContext = wx.createInnerAudioContext();
 //  let ctx = wx.createCanvasContext('mycanvas');  
 
 var app = getApp();
-let isFocusing = false
+// let isFocusing = false
 const replyCount = config.getReplyCount;
 
 var webSiteName = config.getWebsiteName;
@@ -29,7 +29,10 @@ Page({
   data: {
     title: '帖子内容', //微信内部数据调用浏览标签
     webSiteName: webSiteName,
+
     detail: {}, //帖子具体信息
+    authorID: null,
+
     commentsList: [],
     // ChildrenCommentsList: [],
     commentCount: '', //设置评论的数目
@@ -39,12 +42,17 @@ Page({
     showerror: 'none', // 设置显示的css样式，error：block   默认：none
     page: 1,
     isLastPage: false,
-    parentID: "0",
+    parentID: 0, //父级评论ID
     focus: false,
-    placeholder: "评论...",
+    placeholder: "回复本帖",
     postID: null,
+
+    isFatherReply:true,
+
     scrollHeight: 0,
+
     postList: [], //通过tags获取的帖子列表
+
     link: '',
     dialog: {
       title: '',
@@ -59,7 +67,7 @@ Page({
     likeList: [], //设置喜欢的用户头像列表
     likeCount: 0,
     displayLike: 'none',
-    userid: "",
+    receiveUserid: "",
     toFromId: "",
     commentdate: "",
     flag: 1,
@@ -68,8 +76,11 @@ Page({
     isLoading: false,
     totalComments: 0,
     isLoginPopup: false,
-    openid: "", //用户身份ID
-    userInfo: {},
+
+    openid: "", //用户身份ID（登录用户身份ID）
+    userid: 0, //登录用户ID
+
+    userInfo: {}, //用户信息
     system: '', //执行生命周期开始时候识别手机系统，Android/IOS
     // downloadFileDomain: wx.getStorageSync('downloadfileDomain'),
     // businessDomain:wx.getStorageSync('businessDomain'),
@@ -313,7 +324,7 @@ Page({
     if (self.data.openid) { //验证是否登录
       var data = {
         openid: self.data.openid, //猜测这个应该是微信后台的
-        postid: self.data.postID //猜测这个应该是三方服务器的
+        postid: self.data.postID //帖子ID
       };
       var url = Api.postIsLikeUrl();
       var postIsLikeRequest = wxRequest.postRequest(url, data);
@@ -390,13 +401,14 @@ Page({
 
   // mark: 根据帖子ID获取帖子内容
   fetchDetailData: function (id) {
+    console.log("当前页面：" + id); //打印测试
     var self = this;
     var getPostDetailRequest = wxRequest.getRequest(Api.getPostByID(id));
-    var res;
+
     var _displayLike = 'none';
     getPostDetailRequest
       .then(response => {
-        res = response;
+        // var res = response;
 
         // console.log(res);
 
@@ -456,6 +468,7 @@ Page({
 
         self.setData({
           detail: response.data, //设置帖子所有信息
+          authorID: response.data.userId, //文章作者ID
           likeCount: _likeCount, //设置点赞数
           postID: id, //设置帖子Id
           // link: response.data.link, //设置帖子链接（无数据项）
@@ -523,7 +536,7 @@ Page({
         if (self.data.openid) {
           self.getIslike();
         }
-      }).then(res => {
+      }).then(response => {
         self.fristOpenComment(); //加载详情页面首次加载评论
       })
       .catch(function (error) {
@@ -901,28 +914,28 @@ Page({
             });
           }
           if (sum != 0) {
-            var locaList=self.data.commentsList;
+            var locaList = self.data.commentsList;
 
-             // mark: 评论列表的合成
-            if(locaList[0] && resFatherList[0]){
-              var locaListLast = locaList.slice(-1)[0];    //复制出最后一个元素
-              var resListFirst= resFatherList.slice(0,1)[0];    //复制出第一个元素
+            // mark: 评论列表的合成
+            if (locaList[0] && resFatherList[0]) {
+              var locaListLast = locaList.slice(-1)[0]; //复制出最后一个元素
+              var resListFirst = resFatherList.slice(0, 1)[0]; //复制出第一个元素
 
 
-              
-              if(locaListLast.id === resListFirst.id){
-                var unionSon = resFatherList.shift().sonList;    //返回削去response子第一个父评论的子列表
 
-                var locaLastSon=locaListLast.sonList.concat(unionSon);
+              if (locaListLast.id === resListFirst.id) {
+                var unionSon = resFatherList.shift().sonList; //返回削去response子第一个父评论的子列表
+
+                var locaLastSon = locaListLast.sonList.concat(unionSon);
 
                 // console.log(locaLastSon);
                 // console.log(locaList);
 
-                locaList[locaList.length-1].sonList=locaLastSon;    
+                locaList[locaList.length - 1].sonList = locaLastSon;
               }
 
             }
-          
+
             self.setData({
               commentsList: [].concat(locaList, resFatherList)
             });
@@ -931,10 +944,10 @@ Page({
 
         }
 
-        
+
       })
       .catch(response => {
-        console.log(response);   //上面的语句执行失败才会执行这个
+        console.log(response); //上面的语句执行失败才会执行这个
 
       }).finally(function () {
         self.setData({
@@ -975,58 +988,101 @@ Page({
   //     });
   //   }
   // },
+
+
+  // mark: 点击评论获取信息------(子评论信息)
   replay: function (e) {
     var self = this;
-    var id = e.currentTarget.dataset.id;
+
+    var id = e.currentTarget.dataset.id; //父级评论ID
+
+    console.log("#########点击replay#########");
+    console.log("父级评论ID[replay:parentID]：" + id); //打印测试
+
     var name = e.currentTarget.dataset.name;
-    var userid = e.currentTarget.dataset.userid;
-    isFocusing = true;
+    var receiveUserid = e.currentTarget.dataset.userid; //接收用户ID
+    console.log("接收消息用户ID：[replay:receiveUserid]" + receiveUserid); //打印测试
+    // isFocusing = true;
     if (self.data.enableComment == "1") {
       self.setData({
         parentID: id,
         placeholder: "回复" + name + ":",
         focus: true,
-        userid: userid
+        receiveUserid: receiveUserid,
+        isFatherReply:false
       });
 
-    }
-    // console.log('toFromId', toFromId);
-    // console.log('replay', isFocusing);
-  },
-  onReplyBlur: function (e) {
-    var self = this;
-    // console.log('onReplyBlur', isFocusing);
-    if (!isFocusing) {
-      {
-        const text = e.detail.value.trim();
-        if (text === '') {
-          self.setData({
-            parentID: "0",
-            placeholder: "评论...",
-            userid: ""
-          });
-        }
+      console.log("评论的父级："+ self.data.isFatherReply);   //打印测试
 
-      }
     }
-    // console.log(isFocusing);
+
+
   },
+
+  //输入框得到焦点（不设置信息）
   onRepleyFocus: function (e) {
     var self = this;
-    isFocusing = false;
+    console.log("#########输入框得到焦点#########");
+    var postid = self.data.postID;
+    var authorReceiver = self.data.authorID;
+
+    
+    console.log("帖子ID（）：" + postid +
+    //
+      "\n接收消息作者ID：" + authorReceiver);
+
+      console.log("被回复用户ID（非作者）receiveUserid：" + self.data.receiveUserid);
+
+      console.log("评论的父级："+ self.data.isFatherReply);   //打印测试
+
+      console.log("父级ID："+ self.data.parentID);   //打印测试
+    // isFocusing = true;
     if (!self.data.focus) {
       self.setData({
         focus: true
       })
     }
   },
+  //输入框失去焦点（父评论信息）
+  onReplyBlur: function (e) {
+    console.log("#########输入框失去焦点#########")
+    var self = this;
+
+    // if (!isFocusing) {
+      
+        const text = e.detail.value.trim();
+        var receiver = self.data.authorID;
+
+
+        console.log("接收消息用户ID(帖作者)：[onReplyBlur:receiveUserid] " + receiver + "未设置") //打印测试
+
+        self.setData({
+          parentID: 0,
+          receiveUserid:receiver,
+          isFatherReply:true
+        });
+        
+        if (text === '') {
+          self.setData({
+            placeholder: "回复本帖",
+          });
+        }
+
+      
+    // }
+
+  },
+
   // mark:提交评论 
   formSubmit: function (e) {
     var self = this;
-    var comment = e.detail.value.inputComment;
-    var parent = self.data.parentID;
-    var postID = e.detail.value.inputPostID;
-    var userid = self.data.userid;
+
+    var postID = e.detail.value.inputPostID; //帖子的ID
+    
+    var parentReplyID = self.data.parentID; //被回复父级评论ID
+    var comment = e.detail.value.inputComment; //评论内容
+    var receiveUserid = self.data.receiveUserid; //接收消息用户ID
+    var author = self.data.authorID;
     if (comment.length === 0) {
       self.setData({
         'dialog.hidden': false,
@@ -1035,25 +1091,32 @@ Page({
 
       });
     } else {
-      if (self.data.openid) {
-        var name = self.data.userInfo.nickName;
-        var author_url = self.data.userInfo.avatarUrl;
-        var email = self.data.openid + "@qq.com";
-        var openid = self.data.openid;
+      if (self.data.openid) { //如果登陆了
+        // var name = self.data.userInfo.nickName;   //登录用户网名
+        // var author_url = self.data.userInfo.avatarUrl;     //登录用户头像
+        // var email = self.data.openid + "@qq.com";   //登录用户邮箱
+        var openid = self.data.openid; //登录用户身份唯一标识
+        
 
         var data = {
           post: postID,
-          author_name: name,
-          author_email: email,
-          content: comment,
-          author_url: author_url,
-          parent: parent,
+
+          parent: parentReplyID, //父级ID（0是评论文章）（不是0就是父级评论的ID）
+
+          //登录用户
           openid: openid,
-          userid: userid
+          userid: userid,
+
+          content: comment,
+
+          //被评论的用户
+          receiveUserid: receiveUserid,
+          //判断是不是本文章作者
+          authorID: author
         };
-        var url = Api.postWeixinComment();
+        var url = Api.postWeixinComment(); //获取评论提交接口
         var postCommentRequest = wxRequest.postRequest(url, data);
-        var postCommentMessage = "";
+        // var postCommentMessage = "";
         postCommentRequest
           .then(res => {
             console.log(res)
@@ -1063,8 +1126,8 @@ Page({
               self.setData({
                 content: '',
                 parentID: "0",
-                userid: 0,
-                placeholder: "评论...",
+                receiveUserid: 0,
+                placeholder: "回复本帖",
                 focus: false,
                 commentsList: []
 
@@ -1084,7 +1147,7 @@ Page({
 
               });
 
-            } else {
+            } else { //登录但是是匿名评论 
 
               if (res.data.code == 'rest_comment_login_required') {
                 wx.showToast({
@@ -1140,7 +1203,7 @@ Page({
               success: function () {}
             })
           })
-      } else {
+      } else { //检测未登录，请求登录
         Auth.checkSession(self, 'isLoginNow');
 
       }
@@ -1148,6 +1211,8 @@ Page({
     }
 
   },
+
+
   agreeGetUser: function (e) {
     let self = this;
     Auth.checkAgreeGetUser(e, app, self, '0');;

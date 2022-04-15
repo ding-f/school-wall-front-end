@@ -27,6 +27,7 @@ module.exports = {
     }
 
     else if (obj.search != '') {
+      
       url += '/search=' + encodeURIComponent(obj.search);
     }
         
@@ -183,7 +184,7 @@ module.exports = {
     return HOST_URI + 'comments'
   }, 
 
-  //提交微信评论
+  // mark: 提交微信评论（未实现）Post方式
   postWeixinComment: function () {
     var url = HOST_URI;
     return url + 'comment/add'

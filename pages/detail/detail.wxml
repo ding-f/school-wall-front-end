@@ -113,15 +113,16 @@
           <image src="{{item.avatarUrl}}" class="comment-gravatar"></image>
           <view class="comment-user-right">
           <!-- data-userid="{{item.userid}}" data-formId="{{item.formId}}" -->
-            <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}"  data-commentdate="{{item.fatherReplyDate}}">{{item.nickName}}</view>
-            <view class="time" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}"  data-commentdate="{{item.fatherReplyDate}}">{{item.fatherReplyDate}}</view>
+            <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}" >{{item.nickName}}</view>
+            <view class="time" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}">{{item.fatherReplyDate}}</view>
           </view>
         </view>
-        <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.author_name}}" data-userid="{{item.userid}}" data-formId="{{item.formId}}" data-commentdate="{{item.date}}"> {{item.content}}</view>
+        <!-- data-formId="{{item.formId}}" -->
+        <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}"  data-commentdate="{{item.fatherReplyDate}}"> {{item.content}}</view>
 
         <!-- 子回复-->
         <view wx:for="{{item.sonList}}" wx:key="itemid1" wx:for-index="idx" wx:for-item="item1">
-          <view class="replay-user" bindtap="replay" data-id="{{item1.id}}" data-name="{{item1.nickName}}"   data-commentdate="{{item1.sonReplyDate}}">
+          <view class="replay-user" bindtap="replay" data-id="{{item.id}}" data-name="{{item1.nickName}}" data-userid="{{item1.sonUserID}}"  data-commentdate="{{item1.sonReplyDate}}">
             <text class="comment-username">{{item1.nickName}}</text>
             <text style="margin: 0 6rpx; color: #959595;">回复</text>
             <text class="comment-username">{{item1.receiverNick}}</text> ：{{item1.content}}
@@ -181,6 +182,8 @@
               <!-- <image src="../../images/entry-more.png" class="comment_icon_more" catchtap="ShowHideMenu" mode=""></image> -->
 
             </view>
+
+            
 
             <!--功能图标-->
             <view class="menu-box {{isShow ? 'emoji-move-in' : 'emoji-move-out'}} {{isLoad ? 'no-emoji-move' : ''}}">
