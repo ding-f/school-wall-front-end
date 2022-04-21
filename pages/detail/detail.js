@@ -263,6 +263,8 @@ Page({
       }
     })
   },
+
+  // mark: 点赞
   clickLike: function (e) {
     var id = e.target.id;
     var self = this;
@@ -892,11 +894,13 @@ Page({
     getCommentsRequest
       .then(response => {
         var dataAll = response.data; //整块数据
+        if (response.statusCode == 200) {
+
         var setLength = dataAll.data.size; //后端设置每页多少评论
 
         var resFatherList = dataAll.data.records;
 
-        var sum = 0;
+        var sum = 0;    //计算每页子评论之和
 
         resFatherList.forEach(
           //index:数组元素索引 value:数组元素值 array：数组本身
@@ -907,7 +911,7 @@ Page({
 
 
 
-        if (response.statusCode == 200) {
+        
           if (sum < setLength) {
             self.setData({
               isLastPage: true
@@ -1213,6 +1217,7 @@ Page({
   },
 
 
+  // mark: 点击登录
   agreeGetUser: function (e) {
     let self = this;
     Auth.checkAgreeGetUser(e, app, self, '0');;

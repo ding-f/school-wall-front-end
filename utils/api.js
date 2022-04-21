@@ -237,7 +237,7 @@ module.exports = {
   //获取用户openid
   getOpenidUrl() {
     var url = HOST_URI;
-    url += "weixin/userlogin";
+    url += "user/wx/login";
     return url;
   },
 

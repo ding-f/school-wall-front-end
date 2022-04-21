@@ -24,6 +24,7 @@ Auth.checkSession=function(appPage,flag)
     // mark: 请求服务器，检查Session是否过期
 Auth.checkLogin=function(appPage){
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');    
+        // wx.checkSession 接口检测当前用户登录态是否有效
         wx.checkSession({
               success: function(){
                 if(!wxLoginInfo.js_code)
@@ -47,9 +48,9 @@ Auth.checkLogin=function(appPage){
 
 
     // mark: 用户登录行为处理
-Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
+Auth.checkAgreeGetUser=function(e,app,appPage,authFlag) 
     {   
-        let wxLoginInfo =wx.getStorageSync('wxLoginInfo');
+        let wxLoginInfo =wx.getStorageSync('wxLoginInfo');      //Code
         if(wxLoginInfo.js_code)
             {
                 Auth.agreeGetUser(e,wxLoginInfo,authFlag).then(res=>{
@@ -180,24 +181,27 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     return new Promise(function(resolve, reject) {
        let args={};
        let data={};        
-       args.js_code =wxLoginInfo.js_code;
+       args.code =wxLoginInfo.js_code;
        wx.showLoading({
         title: "正在登录...",
         mask: true
        })
-       wx.getUserProfile({
+       //首先请求了Code，微信服务器就知道该返回哪个用户的Profile信息
+       wx.getUserProfile({      //微信接口，生成用户信息（点击了授权就会获取到）
         lang: 'zh_CN',
         desc: '登录后信息展示',
         success: (res) => {
-          let userInfo = res.userInfo || {}
+          let userInfo = res.userInfo || {}     //微信服务器传过来的用户信息
           wx.setStorageSync('userInfo', userInfo)
   
           userInfo.isLogin =true;
           args.avatarUrl=userInfo.avatarUrl;
-          args.nickname=userInfo.nickName;
+          args.nickName=userInfo.nickName;
+
+        //   console.log(args);
           data.userInfo =userInfo;         
-          var url = Api.getOpenidUrl();  
-          var postOpenidRequest = wxRequest.postRequest(url, args);
+          var url = Api.getOpenidUrl();     
+          var postOpenidRequest = wxRequest.postRequest(url, args);     //args带到本地服务器
             //获取openid
             wx.hideLoading();  
                  postOpenidRequest.then(response => {
@@ -318,8 +322,8 @@ Auth.setUserInfoData = function(appPage)        //传过来整个APP页面
 {    
     if(!appPage.data.openid){       //如果设置了微信用户唯一标识，就不用执行以下，如果没设置就会设置
           appPage.setData({
-            userInfo: wx.getStorageSync('userInfo'),
-            openid:wx.getStorageSync('openid'),
+            userInfo: wx.getStorageSync('userInfo'),        //头像昵称等信息
+            openid:wx.getStorageSync('openid'),     //openID
             userLevel:wx.getStorageSync('userLevel')
         })
       
