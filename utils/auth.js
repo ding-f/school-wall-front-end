@@ -8,12 +8,12 @@ var app = getApp();
 
 const Auth = {}
 
-// mark: 检查是否登录，如果没有登录就会弹出请求登录对话框 
+// mark: 检测当前用户登录态是否有效，失效登录弹出请求登录对话框 （需登录项加载）
 Auth.checkSession=function(appPage,flag)
     {
         let  openid =wx.getStorageSync('openid');
         if(!openid){
-           if ('isLoginNow'==flag) {             
+           if ('isLoginNow'==flag) {             //作用是呼出登录对话框，点击登录调用本地函数checkAgreeGetUser
                 var userInfo ={avatarUrl:"../../images/gravatar.png",nickName:"登录",isLogin:false}          
                 appPage.setData({isLoginPopup: true,userInfo:userInfo});
             }
@@ -21,33 +21,33 @@ Auth.checkSession=function(appPage,flag)
         }
     }
 
-    // mark: 请求服务器，检查Session是否过期
+    // mark: 请求服务器，检查Session是否过期（需要登录权限页面的 onLoad 加载）【准备实现Shiro Session验证是否失效，如果失效重传JWT】
 Auth.checkLogin=function(appPage){
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');    
-        // wx.checkSession 接口检测当前用户登录态是否有效
+        // wx.checkSession 接口检测当前用户登录态是否有效（微信官方）
         wx.checkSession({
-              success: function(){
+              success: function(){      //微信服务器的session_key未失效
                 if(!wxLoginInfo.js_code)
                 {
                     Auth.wxLogin().then(res=>{              
                         appPage.setData({wxLoginInfo:res});
                         wx.setStorageSync('wxLoginInfo',res);                    
-                        console.log('checkSession_success_wxLogins');
+                        console.log('checkSession_success_wxLogins');      
                     })  
                 }
               },
               fail: function(){
-                 Auth.wxLogin().then(res=>{              
+                 Auth.wxLogin().then(res=>{                //微信服务器的session_key失效(需重新登录)
                         appPage.setData({wxLoginInfo:res});
                         wx.setStorageSync('wxLoginInfo',res);
-                        console.log('checkSession_fail_wxLoginfo');
+                        console.log('checkSession_fail_wxLoginfo');   
                 })
               }
         })
     }
 
 
-    // mark: 用户登录行为处理
+    // mark: 点击同意登录【准备实现JWT签证】
 Auth.checkAgreeGetUser=function(e,app,appPage,authFlag) 
     {   
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');      //Code
@@ -73,7 +73,7 @@ Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
                             success (res) {
                               if (res.confirm) {
                                 Auth.logout(appPage);            
-                                Auth.checkLogin(appPage); 
+                                Auth.checkLogin(appPage);   //推翻登录流程重头来
                               
                               } else if (res.cancel) {
                                 
@@ -191,6 +191,7 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
         lang: 'zh_CN',
         desc: '登录后信息展示',
         success: (res) => {
+            // console.log(res);
           let userInfo = res.userInfo || {}     //微信服务器传过来的用户信息
           wx.setStorageSync('userInfo', userInfo)
   
@@ -205,29 +206,30 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
             //获取openid
             wx.hideLoading();  
                  postOpenidRequest.then(response => {
-                if (response.data.status == '200') {
-                    //console.log(response.data.openid)
+                if (response.data.code == '200') {
+                    console.log(response);
                     console.log("授权登录获取成功");
-                    data.openid= response.data.openid;
+                    data.openid= response.data.data.openId;
                     var userLevel={};
-                    if(response.data.userLevel)
+                    if(response.data.data.role=="0")
                     {
-                        userLevel=response.data.userLevel;
+                        userLevel.level="0";
+                        userLevel.levelName="AKU童鞋";
+                        
                     }
                     else 
                     {
-                        userLevel.level="0";
-                        userLevel.levelName="订阅者";
+                        userLevel=response.data.data.role;
                     }
                     data.userLevel=userLevel;
                     data.errcode="";
-                    data.userId=  response.data.userId;                      
+                    data.userId=  response.data.data.id;                      
                     resolve(data);
 
                 }
                 else {
                     data.errcode = response.code;
-                    data.message=  response.message;
+                    data.message = response.msg;
                     resolve(args);
                 }
             })
@@ -318,13 +320,13 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     //     }
     }) 
 }
-Auth.setUserInfoData = function(appPage)        //传过来整个APP页面
+Auth.setUserInfoData = function(appPage)        //为传过来整个APP页面，设置用户信息
 {    
     if(!appPage.data.openid){       //如果设置了微信用户唯一标识，就不用执行以下，如果没设置就会设置
           appPage.setData({
             userInfo: wx.getStorageSync('userInfo'),        //头像昵称等信息
             openid:wx.getStorageSync('openid'),     //openID
-            userLevel:wx.getStorageSync('userLevel')
+            userLevel:wx.getStorageSync('userLevel')        //用户等级类型
         })
       
     }

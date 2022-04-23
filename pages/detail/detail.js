@@ -117,7 +117,7 @@ Page({
     // self.getEnableComment();     // mark: 获取设置是否开启评论
     self.fetchDetailData(options.id); //获取帖子详细数据
     Auth.setUserInfoData(self); //给当前页设置用户信息
-    Auth.checkLogin(self);
+    Auth.checkLogin(self);    //
     // mark: 119 获取广告
     // Adapter.setInterstitialAd("enable_detail_interstitial_ad");
     wx.getSystemInfo({
@@ -315,7 +315,7 @@ Page({
           });
         })
     } else {
-      Auth.checkSession(self, 'isLoginNow');
+      Auth.checkSession(self, 'isLoginNow');    //点赞未登录,请求登录
 
     }
   },
@@ -364,7 +364,7 @@ Page({
           url: '../pay/pay?flag=1&openid=' + self.data.openid + '&postid=' + self.data.postID + '&praiseWord=' + praiseWord
         })
       } else { //否则：去登录页面
-        Auth.checkSession(self, 'isLoginNow');
+        Auth.checkSession(self, 'isLoginNow');    //打赏未登录，请求登录
       }
     } else if (enterpriseMinapp == "0" || system == 'iOS') { //你手机是IOS或者企业minapp==‘0‘，满足一项即可
 
@@ -1208,7 +1208,7 @@ Page({
             })
           })
       } else { //检测未登录，请求登录
-        Auth.checkSession(self, 'isLoginNow');
+        Auth.checkSession(self, 'isLoginNow');  //评论未登录，请求登录
 
       }
 
@@ -1254,13 +1254,13 @@ Page({
     });
   },
 
-  onCreatePoster: function () {
+  onCreatePoster: function () {   //创建帖子海报
     var self = this;
     this.ShowHideMenu();
     if (self.data.openid) {
       self.creatArticlePoster(self, Api, util, self.modalView, Poster);
     } else {
-      Auth.checkSession(self, 'isLoginNow');
+      Auth.checkSession(self, 'isLoginNow');  //创建海报未登录，请求登录
 
     }
 

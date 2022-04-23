@@ -2,6 +2,7 @@
 <import src="login.wxml" />
 
 <template name="login-popup">
+    <!-- show = isLoginPopup: true -->
     <view class="zan-popup zan-popup--center login-popup {{show ? 'zan-popup--show' : ''}}">
         <!-- 遮罩层 -->
         <view class="zan-popup__mask" bindtap="closeLoginPopup"></view>

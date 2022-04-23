@@ -52,7 +52,7 @@ function getRequest(url, data) {
  * url
  * data 以对象的格式传入
  */
-function postRequest(url, data) {
+function postRequest(url, data,header=null) {
     var postRequest = wxPromisify(wx.request)
     wx.showNavigationBarLoading()
     return postRequest({
@@ -60,7 +60,8 @@ function postRequest(url, data) {
         method: 'POST',
         data: data,
         header: {
-            "content-type": "application/json"
+            "content-type": "application/json",
+            "Authorization":header
         },
     })
 }

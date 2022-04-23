@@ -4,7 +4,7 @@
     <view class="login-inner">
       <image class="avatar" src="../../images/gravatar.png"></image>
       <view class="username">
-        <text>立即登录，体验更多功能</text>
+        <text>立即登录，开启校园新生活</text>
       </view>
     </view>
 

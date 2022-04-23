@@ -51,7 +51,7 @@
     </view>
   </block>
   <!-- 没有帖子时的提示信息 -->
-  <view class="tips" style="display:{{shownodata}}">你还没有相关帖子哟~</view>
+  <view class="tips" style="display:{{shownodata}}">还没有相关帖子哟~</view>
   <!-- 登录框 -->
   <template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
   <!-- 无法访问网络 -->
