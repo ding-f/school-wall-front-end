@@ -35,7 +35,7 @@ Page({
 
     commentsList: [],
     // ChildrenCommentsList: [],
-    commentCount: '', //设置评论的数目
+    commentCount: 0, //设置评论的数目
     detailDate: '',
     commentValue: '',
     display: 'none', // 设置帖子、猜你喜欢、评论、等css样式
@@ -67,14 +67,14 @@ Page({
     likeList: [], //设置喜欢的用户头像列表
     likeCount: 0,
     displayLike: 'none',
-    receiveUserid: "",
+    receiveUserid: 0,
     toFromId: "",
     commentdate: "",
     flag: 1,
     // logo: wx.getStorageSync('logoImageurl'),     //此值这个脚本里没有用
     enableComment: true,
     isLoading: false,
-    totalComments: 0,
+    // totalComments: 0,
     isLoginPopup: false,
 
     openid: "", //用户身份ID（登录用户身份ID）
@@ -424,11 +424,11 @@ Page({
         // }
 
         //获取多少条评论
-        if (response.data.totalComments != null && response.data.totalComments != '') {
-          self.setData({
-            commentCount: "有" + response.data.totalComments + "条评论" // mark: 416 设置一共多少条评论
-          });
-        };
+        // if (response.data.totalComments != null && response.data.totalComments != '') {
+        //   self.setData({
+        //     commentCount: response.data.totalComments // mark: 416 设置一共多少条评论
+        //   });
+        // };
         var _likeCount = response.data.likeCount; // mark: 419 喜欢计数
         if (response.data.likeCount != '0') { //如果喜欢不为0，设置样式
           _displayLike = "block"
@@ -477,7 +477,7 @@ Page({
           detailDate: util.cutstr(response.data.date, 10, 1), //帖子的发布时间，只裁剪到年月日
           display: 'block',
           displayLike: _displayLike, // mark: 465 如果有喜欢数，把喜欢数设置出显示效果
-          totalComments: response.data.totalComments, //设置评论总数
+          // totalComments: response.data.totalComments, //设置评论总数
           // postImageUrl: response.data.postImageUrl,     //设置帖子主题图片（无效数据）
           // detailSummaryHeight: openAded ? '' : '400rpx'   //设置广告高度
 
@@ -889,47 +889,73 @@ Page({
     self.setData({
       isLoading: true
     })
+    var authJwt=wx.getStorageSync('authorization');
+    var getCommentsRequest = wxRequest.getRequest(Api.getCommentsReplay(args),'',authJwt); // mark: API处获取评论列表
 
-    var getCommentsRequest = wxRequest.getRequest(Api.getCommentsReplay(args)); // mark: API处获取评论列表
+// console.log(auth);
+// console.log(getCommentsRequest.httpInfo);
+    // Object.defineProperties(getCommentsRequest.httpInfo.header,'header',{
+    //   'Content-Type': 'application/json',
+    //   'Authorization': auth
+
+    // });
+    // getCommentsRequest.httpInfo.header.Authorization=wx.getStorageSync('Authorization');
+
     getCommentsRequest
       .then(response => {
         var dataAll = response.data; //整块数据
-        if (response.statusCode == 200) {
+        
+        
+        if (dataAll.code == 200) {
+        var pageCount = dataAll.data.pages; //页面总数
+        var totalComments=dataAll.data.total;  //总评论数
 
-        var setLength = dataAll.data.size; //后端设置每页多少评论
+        // var setLength = dataAll.data.size; //后端设置每页多少评论
 
         var resFatherList = dataAll.data.records;
+        var resFatherFirstSonLen= resFatherList[0].sonList.length;
 
-        var sum = 0;    //计算每页子评论之和
+        var currentPageNum = dataAll.data.current;
 
-        resFatherList.forEach(
-          //index:数组元素索引 value:数组元素值 array：数组本身
-          function (value, index, array) {
+        var localComments = self.data.commentsList;
+        
+        self.setData({
+          commentCount:totalComments
+        });
 
-            sum = sum + value.sonList.length;
-          });
 
+        // var sum = 0;    //计算每页子评论之和
 
+        // resFatherList.forEach(
+        //   //index:数组元素索引 value:数组元素值 array：数组本身
+        //   function (value, index, array) {
+
+        //     sum = sum + value.sonList.length;
+        //   });
 
         
-          if (sum < setLength) {
+          if (currentPageNum  >= pageCount) {
             self.setData({
               isLastPage: true
             });
           }
-          if (sum != 0) {
-            var locaList = self.data.commentsList;
 
-            // mark: 评论列表的合成
-            if (locaList[0] && resFatherList[0]) {
-              var locaListLast = locaList.slice(-1)[0]; //复制出最后一个元素
-              var resListFirst = resFatherList.slice(0, 1)[0]; //复制出第一个元素
+          
+          if (resFatherFirstSonLen !== 0 && localComments.length!==0  ) {
+            var locaList = localComments;
+
+            // 评论列表的合成（选出本地最后一个 和响应列表第一个）
+            if (locaList.slice(-1)[0] && resFatherList[0]) {
+              var locaListLast = locaList.slice(-1)[0]; //选出本地列表最后一个元素
+              var resListFirst = resFatherList.slice(0, 1)[0]; //选出响应列表第一个元素
 
 
 
               if (locaListLast.id === resListFirst.id) {
                 var unionSon = resFatherList.shift().sonList; //返回削去response子第一个父评论的子列表
 
+                // console.log(unionSon);
+                
                 var locaLastSon = locaListLast.sonList.concat(unionSon);
 
                 // console.log(locaLastSon);
@@ -940,15 +966,22 @@ Page({
 
             }
 
+            // console.log(locaList)
+            // console.log(resFatherList)
+
             self.setData({
-              commentsList: [].concat(locaList, resFatherList)
+              commentsList: localComments.concat(resFatherList)
             });
-            // console.log(self.data.commentsList);
+            
+          }else{
+
+            self.setData({
+              commentsList: localComments.concat(resFatherList)
+            });
           }
 
         }
-
-
+// console.log(localComments)
       })
       .catch(response => {
         console.log(response); //上面的语句执行失败才会执行这个
@@ -994,17 +1027,17 @@ Page({
   // },
 
 
-  // mark: 点击评论获取信息------(子评论信息)
+  // mark: 点击评论获取需要回复的目标信息------(子评论信息)
   replay: function (e) {
     var self = this;
 
-    var id = e.currentTarget.dataset.id; //父级评论ID
+    var id = e.currentTarget.dataset.id; //父级评论ID *（子回复需要）
 
     console.log("#########点击replay#########");
     console.log("父级评论ID[replay:parentID]：" + id); //打印测试
 
     var name = e.currentTarget.dataset.name;
-    var receiveUserid = e.currentTarget.dataset.userid; //接收用户ID
+    var receiveUserid = e.currentTarget.dataset.userid; //接收用户ID  *
     console.log("接收消息用户ID：[replay:receiveUserid]" + receiveUserid); //打印测试
     // isFocusing = true;
     if (self.data.enableComment == "1") {
@@ -1012,11 +1045,12 @@ Page({
         parentID: id,
         placeholder: "回复" + name + ":",
         focus: true,
-        receiveUserid: receiveUserid,
-        isFatherReply:false
+
+        receiveUserid: receiveUserid, //*
+        isFatherReply:false   //*
       });
 
-      console.log("评论的父级："+ self.data.isFatherReply);   //打印测试
+      console.log("是否评论的父级："+ self.data.isFatherReply);   //打印测试
 
     }
 
@@ -1027,23 +1061,23 @@ Page({
   onRepleyFocus: function (e) {
     var self = this;
     console.log("#########输入框得到焦点#########");
-    var postid = self.data.postID;
-    var authorReceiver = self.data.authorID;
-
+    var postid = self.data.postID;    //子父评论共有信息
+    var author = self.data.authorID;
     
     console.log("帖子ID（）：" + postid +
-    //
-      "\n接收消息作者ID：" + authorReceiver);
+      "\n贴子作者ID：" + author);     //本帖ID和作者ID
+      //子需要postid
+      //父级需要postid和author
 
       console.log("被回复用户ID（非作者）receiveUserid：" + self.data.receiveUserid);
 
-      console.log("评论的父级："+ self.data.isFatherReply);   //打印测试
+      console.log("评论的是否为父级："+ self.data.isFatherReply);   //打印测试
 
-      console.log("父级ID："+ self.data.parentID);   //打印测试
+      console.log("父级ID："+ self.data.parentID);   //子回复需要
     // isFocusing = true;
     if (!self.data.focus) {
       self.setData({
-        focus: true
+        focus: true   //输入框获取焦点
       })
     }
   },
@@ -1061,14 +1095,14 @@ Page({
         console.log("接收消息用户ID(帖作者)：[onReplyBlur:receiveUserid] " + receiver + "未设置") //打印测试
 
         self.setData({
-          parentID: 0,
+          // parentID: 0,
           receiveUserid:receiver,
-          isFatherReply:true
+          
         });
         
         if (text === '') {
           self.setData({
-            placeholder: "回复本帖",
+            placeholder: "回复本墙帖",
           });
         }
 
@@ -1081,12 +1115,18 @@ Page({
   formSubmit: function (e) {
     var self = this;
 
-    var postID = e.detail.value.inputPostID; //帖子的ID
+    // var postID = e.detail.value.inputPostID; //帖子的ID
+    var postID=self.data.postID;
+    var author = self.data.authorID;
     
     var parentReplyID = self.data.parentID; //被回复父级评论ID
+
     var comment = e.detail.value.inputComment; //评论内容
-    var receiveUserid = self.data.receiveUserid; //接收消息用户ID
-    var author = self.data.authorID;
+    
+    var receiveUserID = self.data.receiveUserid; //接收消息用户ID
+
+    var fatherReply=self.data.isFatherReply;  //是否是父级评论
+    
     if (comment.length === 0) {
       self.setData({
         'dialog.hidden': false,
@@ -1099,39 +1139,41 @@ Page({
         // var name = self.data.userInfo.nickName;   //登录用户网名
         // var author_url = self.data.userInfo.avatarUrl;     //登录用户头像
         // var email = self.data.openid + "@qq.com";   //登录用户邮箱
-        var openid = self.data.openid; //登录用户身份唯一标识
+        // var openid = self.data.openid; //登录用户身份唯一标识
         
 
         var data = {
-          post: postID,
-
-          parent: parentReplyID, //父级ID（0是评论文章）（不是0就是父级评论的ID）
+          postID: postID,
+          authorID:author,
+        
+          parentID: parentReplyID, //父级ID（0是评论文章）（不是0就是父级评论的ID）
 
           //登录用户
-          openid: openid,
-          userid: userid,
+          // openID: openid,
+          // userID: userid,
 
           content: comment,
 
           //被评论的用户
-          receiveUserid: receiveUserid,
+          receiverID: receiveUserID,
+          isFatherReply: fatherReply
           //判断是不是本文章作者
-          authorID: author
         };
         var url = Api.postWeixinComment(); //获取评论提交接口
-        var postCommentRequest = wxRequest.postRequest(url, data);
+        var authJwt=wx.getStorageSync('authorization');
+        var postCommentRequest = wxRequest.postRequest(url, data ,authJwt);
         // var postCommentMessage = "";
         postCommentRequest
           .then(res => {
             console.log(res)
-            var code = res.data.code;
-            if (res.data.code == 'success') {
+            // var code = res.data.code;
+            if (res.data.code == '200') {
 
               self.setData({
                 content: '',
                 parentID: "0",
                 receiveUserid: 0,
-                placeholder: "回复本帖",
+                placeholder: "回复本墙帖",
                 focus: false,
                 commentsList: []
 
@@ -1143,13 +1185,13 @@ Page({
                 icon: "none",
                 duration: 3000
               });
-              postCommentMessage = res.data.message;
-              var commentCounts = parseInt(self.data.totalComments) + 1;
-              self.setData({
-                totalComments: commentCounts,
-                commentCount: "有" + commentCounts + "条评论"
+              // postCommentMessage = res.data.message;
+              // var commentCounts = parseInt(self.data.totalComments) + 1;
+              // self.setData({
+              //   totalComments: commentCounts,
+              //   commentCount: "有" + commentCounts + "条评论"
 
-              });
+              // });
 
             } else { //登录但是是匿名评论 
 

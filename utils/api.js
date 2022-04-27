@@ -187,7 +187,7 @@ module.exports = {
   // mark: 提交微信评论（未实现）Post方式
   postWeixinComment: function () {
     var url = HOST_URI;
-    return url + 'comment/add'
+    return url + 'comment/reply'
   }, 
 
   //获取微信评论

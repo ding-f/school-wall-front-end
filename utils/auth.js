@@ -8,7 +8,7 @@ var app = getApp();
 
 const Auth = {}
 
-// mark: 检测当前用户登录态是否有效，失效登录弹出请求登录对话框 （需登录项加载）
+// mark: 检测当前用户是否已登录，失效登录弹出请求登录对话框 （需登录项加载）
 Auth.checkSession=function(appPage,flag)
     {
         let  openid =wx.getStorageSync('openid');
@@ -29,6 +29,8 @@ Auth.checkLogin=function(appPage){
               success: function(){      //微信服务器的session_key未失效
                 if(!wxLoginInfo.js_code)
                 {
+                    //查证UUID是否过期（过期重传Jwt）
+                    //wxLogin()封装了wx.login()
                     Auth.wxLogin().then(res=>{              
                         appPage.setData({wxLoginInfo:res});
                         wx.setStorageSync('wxLoginInfo',res);                    
@@ -36,18 +38,24 @@ Auth.checkLogin=function(appPage){
                     })  
                 }
               },
-              fail: function(){
-                 Auth.wxLogin().then(res=>{                //微信服务器的session_key失效(需重新登录)
+              fail: function(){//实现查证Jwt是否过期（过期签证Jwt）
+                Auth.logout(appPage);
+                wx.reLaunch({
+                    url: '../index/index'
+                  });
+                 Auth.wxLogin().then(res=>{                //微信服务器的session_key失效(官方：说需重新登录小程序)
+                    
                         appPage.setData({wxLoginInfo:res});
                         wx.setStorageSync('wxLoginInfo',res);
                         console.log('checkSession_fail_wxLoginfo');   
-                })
+                });
+                
               }
         })
     }
 
 
-    // mark: 点击同意登录【准备实现JWT签证】
+    // mark: 点击同意登录【未过期就不进行JWT签证】
 Auth.checkAgreeGetUser=function(e,app,appPage,authFlag) 
     {   
         let wxLoginInfo =wx.getStorageSync('wxLoginInfo');      //Code
@@ -177,6 +185,8 @@ Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
 //             }
 //         }) 
 // }
+
+//弹窗内用户点击同意授权触发
 Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     return new Promise(function(resolve, reject) {
        let args={};
@@ -210,6 +220,8 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
                     console.log(response);
                     console.log("授权登录获取成功");
                     data.openid= response.data.data.openId;
+                    // console.log(response.header.Authorization);
+                    wx.setStorageSync('authorization',response.header.Authorization);
                     var userLevel={};
                     if(response.data.data.role=="0")
                     {
@@ -320,7 +332,8 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     //     }
     }) 
 }
-Auth.setUserInfoData = function(appPage)        //为传过来整个APP页面，设置用户信息
+// mark: 为传过来整个APP页面，设置用户信息
+Auth.setUserInfoData = function(appPage)        
 {    
     if(!appPage.data.openid){       //如果设置了微信用户唯一标识，就不用执行以下，如果没设置就会设置
           appPage.setData({
@@ -332,6 +345,8 @@ Auth.setUserInfoData = function(appPage)        //为传过来整个APP页面，
     }
     
 }
+
+//只进行返回Code操作
 Auth.wxLogin=function(){
         return new Promise(function (resolve, reject) {
             wx.login({
@@ -349,6 +364,7 @@ Auth.wxLogin=function(){
 
     }
 
+    //执行退出登录按钮
 Auth.logout=function(appPage){
     appPage.setData({
         openid:'',
@@ -361,6 +377,7 @@ Auth.logout=function(appPage){
     wx.removeStorageSync('openid');
     wx.removeStorageSync('userLevel');
     wx.removeStorageSync('wxLoginInfo');
+    wx.removeStorageSync('authorization');
 }
 
 module.exports = Auth;

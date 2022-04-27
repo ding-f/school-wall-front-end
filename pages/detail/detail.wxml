@@ -21,7 +21,7 @@
       <image src="../../images/calendar.png"></image>
       <text>{{detailDate}}</text>
       <image src="../../images/comments.png"></image>
-      <text>{{totalComments}}</text>
+      <text>{{commentCount}}</text>
       <image src="../../images/pageviews.png"></image>
       <text>{{detail.pageviews}}</text>
       <image src="../../images/home-like.png"></image>
@@ -78,7 +78,7 @@
 
     <!-- 点个赞 -->
     <view class="likePost" style="display:{{displayLike}}">
-      <view class="subTitle">点个赞？</view>
+      <view class="subTitle">点个小心心？</view>
       <view class="subTitle_line"></view>
 
       <view class="likeTitle">
@@ -102,7 +102,7 @@
     <!-- 小标题 -->
     <view class="subTitle" id="relatedTitle">
       <view>评论交流</view>
-      <view class="comment-num">{{commentCount}}</view>
+      <view class="comment-num">已收集 {{commentCount}} 条评论</view>
     </view>
     <view class="subTitle_line subTitle_line_comment"></view>
 
@@ -113,11 +113,14 @@
           <image src="{{item.avatarUrl}}" class="comment-gravatar"></image>
           <view class="comment-user-right">
           <!-- data-userid="{{item.userid}}" data-formId="{{item.formId}}" -->
+          <!-- 点击网名可回复 -->
             <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}" >{{item.nickName}}</view>
+            <!-- 点击时间可回复 -->
             <view class="time" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}">{{item.fatherReplyDate}}</view>
           </view>
         </view>
         <!-- data-formId="{{item.formId}}" -->
+        <!-- 点击内容可回复 -->
         <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}"  data-commentdate="{{item.fatherReplyDate}}"> {{item.content}}</view>
 
         <!-- 子回复-->
@@ -176,7 +179,7 @@
               <!-- 评论输入框和发送按钮 -->
               <view class="comment_input_box">
                 <input class="comment-input" type='text' confirm-type="send" cursor-spacing="10" maxlength="100" name="inputComment" value="{{content}}" placeholder="{{placeholder}}" focus="{{focus}}" bindblur="onReplyBlur" bindfocus="onRepleyFocus" />
-                <button class="comment-button touch-active" formType="submit">发送</button>
+                <button class="comment-button touch-active" formType="submit"  >发送</button>
               </view>
               <!-- 更多按钮 -->
               <!-- <image src="../../images/entry-more.png" class="comment_icon_more" catchtap="ShowHideMenu" mode=""></image> -->

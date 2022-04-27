@@ -34,17 +34,22 @@ if (!Promise.prototype.finally) {
  * url
  * data 以对象的格式传入
  */
-function getRequest(url, data) {
-    var getRequest = wxPromisify(wx.request);       //异步处理
-    wx.showNavigationBarLoading()       //在当前页面显示导航条加载动画
-    return getRequest({
+function getRequest(url, data,authJwt='') {
+    // var authJwt=wx.getStorageSync('authorization');
+    var httpInfo={
         url: url,
         method: 'GET',
         data: data,
         header: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization':authJwt
         }
-    })
+    };
+    var getRequest = wxPromisify(wx.request);       //异步处理
+    
+    wx.showNavigationBarLoading();       //在当前页面显示导航条加载动画
+
+    return getRequest(httpInfo);
 }
 
 /**
@@ -52,16 +57,17 @@ function getRequest(url, data) {
  * url
  * data 以对象的格式传入
  */
-function postRequest(url, data,header=null) {
-    var postRequest = wxPromisify(wx.request)
-    wx.showNavigationBarLoading()
+function postRequest(url, data, authJwt='') {
+    var postRequest = wxPromisify(wx.request);
+    wx.showNavigationBarLoading();
+
     return postRequest({
         url: url,
         method: 'POST',
         data: data,
         header: {
             "content-type": "application/json",
-            "Authorization":header
+            "Authorization": authJwt
         },
     })
 }
