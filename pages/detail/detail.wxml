@@ -78,16 +78,24 @@
 
     <!-- 点个赞 -->
     <view class="likePost" style="display:{{displayLike}}">
-      <view class="subTitle">点个小心心？</view>
+      
+      <view class="subTitle">送个心？</view>
+      
       <view class="subTitle_line"></view>
 
+  <view class="comment-btn">
+      
+    
       <view class="likeTitle">
         <text>{{likeCount}}人已赞</text>
       </view>
-
       <view class="like-btn-icon">
         <image src="../../images/like-on.png" class="img-like" id="liketop" ></image>
       </view>
+
+      <van-button round size="small" type="primary" bindtap="commentPage">评论本帖</van-button>
+    
+  </view>
       <view class="likeText">
         <block wx:key="id" wx:for="{{likeList}}">
           <image src="{{item}}" class="like-gravatar"></image>
@@ -224,7 +232,7 @@
                       <image src="../../images/{{likeImag}}" catchtap="clickLike" id="likebottom" class="img-menu"></image>
                     </view>
                     <view>
-                      <text>点赞</text>
+                      <text>送心</text>
                     </view>
                   </view>
                   <view style="width:25%; float:left; ">

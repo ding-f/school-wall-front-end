@@ -144,19 +144,20 @@
   font-size: 28rpx;
   color: #959595;
   vertical-align: middle;
-  position: absolute;
-  top: 120rpx;
-  left: 0;
+
+}
+.comment-btn{
+  display: flex;
+  justify-content:space-between;
 }
 
 .like-btn-icon {
-  position: absolute;
-  top: 120rpx;
-  left: 140rpx;
+  position: relative;
+  left: -160rpx;
 }
 
 .likeText {
-  margin: 140rpx 0 20rpx;
+  margin: 20rpx 0rpx;
 }
 
 .img-like {
@@ -165,7 +166,7 @@
   display: inline-block;
   text-align: center;
   margin-right: 20rpx;
-  margin-top: 8rpx;
+  margin-top: 14rpx;
 }
 
 .like-gravatar {

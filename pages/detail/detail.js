@@ -44,7 +44,7 @@ Page({
     isLastPage: false,
     parentID: 0, //父级评论ID
     focus: false,
-    placeholder: "回复本帖",
+    placeholder: "回复此墙帖",
     postID: null,
 
     isFatherReply:true,
@@ -1086,28 +1086,29 @@ Page({
     console.log("#########输入框失去焦点#########")
     var self = this;
 
-    // if (!isFocusing) {
-      
         const text = e.detail.value.trim();
-        var receiver = self.data.authorID;
-
-
-        console.log("接收消息用户ID(帖作者)：[onReplyBlur:receiveUserid] " + receiver + "未设置") //打印测试
-
-        self.setData({
-          // parentID: 0,
-          receiveUserid:receiver,
-          
-        });
-        
         if (text === '') {
           self.setData({
-            placeholder: "回复本墙帖",
+            placeholder: "回复此墙帖",
           });
         }
 
+
+  },
+
+  //回复父级评论按钮
+  commentPage: function(){
+    var self = this;
+    var receiver = self.data.authorID;
+    console.log("###点击了父级评论按钮###");
+    self.setData({
+      isFatherReply:true,
+      receiveUserid:receiver,
       
-    // }
+    });
+    
+    console.log("接收消息用户ID " + receiver ) //打印测试 
+    console.log("评论的是否为父级："+ self.data.isFatherReply);   //打印测试
 
   },
 
@@ -1173,14 +1174,14 @@ Page({
                 content: '',
                 parentID: "0",
                 receiveUserid: 0,
-                placeholder: "回复本墙帖",
+                placeholder: "回复此墙帖",
                 focus: false,
                 commentsList: []
 
               });
 
               wx.showToast({
-                title: res.data.message,
+                title: res.data.msg,
                 mask: false,
                 icon: "none",
                 duration: 3000
@@ -1235,7 +1236,7 @@ Page({
           }).then(res => {
 
             console.log(res);
-            if (res.data.code == 'success' && res.data.comment_approved == "1") {
+            if (res.data.code == '200' && res.data.data == true) {
 
               self.fristOpenComment(); //
             }
