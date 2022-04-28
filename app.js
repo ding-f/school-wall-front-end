@@ -67,5 +67,5 @@ App({
     isGetUserInfo: false,
     isGetOpenid: false
 
-  }
+  },
 })

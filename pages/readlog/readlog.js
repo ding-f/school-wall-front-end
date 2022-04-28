@@ -59,7 +59,9 @@ Page({
     Auth.checkAgreeGetUser(e,app,self,'0');        
         
   }, 
-
+  onShow:function(){            
+    this.getTabBar().init();
+  },
   refresh:function(e)
   {
     var self=this;

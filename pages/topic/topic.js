@@ -48,7 +48,7 @@ Page({
     },
 
     onShow:function(){            
-
+      this.getTabBar().init();
     },
 
     // mark: 获取分类列表方法

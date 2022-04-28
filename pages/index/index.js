@@ -166,7 +166,8 @@ Page({
     this.getHomeconfig();
 
   },
-  onShow: function (options) {
+  onShow: function () {
+    this.getTabBar().init();
     wx.setStorageSync('openLinkCount', 0);
 
     var nowDate = new Date();

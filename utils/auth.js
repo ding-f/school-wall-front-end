@@ -217,7 +217,7 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
             wx.hideLoading();  
                  postOpenidRequest.then(response => {
                 if (response.data.code == '200') {
-                    console.log(response);
+                    // console.log(response);
                     console.log("授权登录获取成功");
                     data.openid= response.data.data.openId;
                     // console.log(response.header.Authorization);
