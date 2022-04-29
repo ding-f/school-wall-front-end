@@ -1,2 +1,57 @@
-<!--pages/publish/publish.wxml-->
-<text>横说竖说</text>
+<view style="background-color:#F7F8FA;">
+
+
+<van-cell-group inset title="文字描述"> 
+
+  <van-field
+    model:value="{{ title }}"
+    label="标题"
+    type="textarea"
+    placeholder="请输入标题"
+    
+    show-word-limit
+    maxlength="66"
+    right-icon="flower-o"
+    bind:change=""
+    size="large"
+  />
+ 
+  <van-field
+    model:value="{{ content }}"
+    label="墙贴内容"
+    type="textarea"
+    placeholder="把你想说的都告诉我 🍭"
+    autosize
+    show-word-limit
+    maxlength="666"
+    right-icon="records"
+    bind:change="onChange"
+    size="large"
+  />
+</van-cell-group>
+  <van-cell-group inset title="插图（最多9张）">
+    <van-cell>
+      <van-uploader 
+      file-list="{{ pictureList }}" 
+      max-size="5120"
+      upload-text="选择图片" 
+      image-fit="cover"
+      bind:after-read="afterRead" 
+      multiple="true" 
+      max-count="9"
+      preview-size
+      capture
+      
+      />
+      
+    </van-cell>
+  </van-cell-group>
+
+  <van-cell-group inset title="点击发布墙贴">
+  
+    <van-button type="primary" block icon="fire" >发布</van-button>
+  
+  </van-cell-group>
+
+</view>
+

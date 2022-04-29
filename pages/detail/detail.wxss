@@ -310,7 +310,7 @@
 }
 
 .comment-input {
-  background-color: #f5f7f7;
+  background-color: #F7F8FA;
   padding: 0 24rpx 0 32rpx;
   font-size: 14px;
   height: 80rpx;
@@ -601,7 +601,7 @@
 .audioControls {
   width: 100%;
   height: 184rpx;
-  background: #fdfdfd;
+  background: #f7f8fa;
   border-radius: 4rpx;
   border: 2rpx solid #eee;
   box-sizing: border-box;

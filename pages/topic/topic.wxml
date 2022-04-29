@@ -1,7 +1,7 @@
 <import src="../../templates/copyright.wxml" />
 <import src="../../templates/login-popup.wxml" />
 
-<view class="topic-list clearfix">
+<view class="topic-list clearfix" style="background-color: #F7F8FA;">
   <block wx:key="id" wx:for="{{categoriesList}}">
     <view class="list-item"  >
       <view  >

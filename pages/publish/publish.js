@@ -5,7 +5,12 @@ Page({
    * 页面的初始数据
    */
   data: {
+ 
+    title:'',
+    content: '',
+    pictureList: [],
 
+    
   },
 
   /**
@@ -62,5 +67,10 @@ Page({
    */
   onShareAppMessage() {
 
-  }
+  },
+  onChange(event) {
+    // event.detail 为当前输入的值
+    console.log(event.detail);
+    
+  },
 })
