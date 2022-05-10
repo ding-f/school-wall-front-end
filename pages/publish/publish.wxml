@@ -1,9 +1,10 @@
 <view style="background-color:#F7F8FA;">
 
-
+<form bindsubmit="formSubmit">
 <van-cell-group inset title="文字描述"> 
 
   <van-field
+    name="post_title"
     model:value="{{ title }}"
     label="标题"
     type="textarea"
@@ -16,7 +17,9 @@
     size="large"
   />
  
+ <!-- bind:change="onChange" -->
   <van-field
+    name="post_content"
     model:value="{{ content }}"
     label="墙贴内容"
     type="textarea"
@@ -25,19 +28,21 @@
     show-word-limit
     maxlength="666"
     right-icon="records"
-    bind:change="onChange"
+    
     size="large"
   />
 </van-cell-group>
-  <van-cell-group inset title="插图（最多9张）">
+  <van-cell-group inset title="插图（最多9张，第一张图片将作为封面）">
     <van-cell>
-      <van-uploader 
+      <van-uploader   
+      name="post_file_list"
       file-list="{{ pictureList }}" 
+      
       max-size="5120"
       upload-text="选择图片" 
       image-fit="cover"
       bind:after-read="afterRead" 
-      multiple="true" 
+      multiple
       max-count="9"
       preview-size
       capture
@@ -49,9 +54,11 @@
 
   <van-cell-group inset title="点击发布墙贴">
   
-    <van-button type="primary" block icon="fire" >发布</van-button>
+    <van-button form-type="submit" type="primary" block icon="fire" >发布</van-button>
   
   </van-cell-group>
+
+</form>
 
 </view>
 

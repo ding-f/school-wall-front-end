@@ -32,6 +32,7 @@ Page({
 
     detail: {}, //帖子具体信息
     authorID: null,
+    imagesList:[],
 
     commentsList: [],
     // ChildrenCommentsList: [],
@@ -429,8 +430,10 @@ Page({
         //     commentCount: response.data.totalComments // mark: 416 设置一共多少条评论
         //   });
         // };
-        var _likeCount = response.data.likeCount; // mark: 419 喜欢计数
-        if (response.data.likeCount != '0') { //如果喜欢不为0，设置样式
+        var resData=response.data;
+
+        var _likeCount = resData.likeCount; // mark: 419 喜欢计数
+        if (resData.likeCount != '0') { //如果喜欢不为0，设置样式
           _displayLike = "block"
         }
 
@@ -446,8 +449,23 @@ Page({
         if (logs.length > 19) { //最多存放20个元素
           logs.pop(); //去除最后一个
         }
-        logs.unshift([id, response.data.title]); //加上现在获取到的[id,标题]
+        logs.unshift([id, resData.title]); //加上现在获取到的[id,标题]
         wx.setStorageSync('readLogs', logs); //将这个数组覆盖掉
+        
+        //设置9图列表
+        // var imageListObj=response.data.postAllImages;
+        var coverImage = resData.postMediumImage;
+
+        var imageList=[];
+        imageList.push(coverImage);
+
+        for (let i = 1; i <= 8; i++) {
+
+          imageList.push(resData["postImage"+i]);
+          
+        }
+
+        // console.log(imageList);
 
         // var openAdLogs = wx.getStorageSync('openAdLogs') || [];
         // var openAded = res.data.excitationAd == '1' ? false : true;
@@ -469,12 +487,13 @@ Page({
         // }
 
         self.setData({
-          detail: response.data, //设置帖子所有信息
-          authorID: response.data.userId, //文章作者ID
+          detail: resData, //设置帖子所有信息
+          imagesList:imageList,
+          authorID: resData.userId, //文章作者ID
           likeCount: _likeCount, //设置点赞数
           postID: id, //设置帖子Id
           // link: response.data.link, //设置帖子链接（无数据项）
-          detailDate: util.cutstr(response.data.date, 10, 1), //帖子的发布时间，只裁剪到年月日
+          detailDate: util.cutstr(resData.date, 10, 1), //帖子的发布时间，只裁剪到年月日
           display: 'block',
           displayLike: _displayLike, // mark: 465 如果有喜欢数，把喜欢数设置出显示效果
           // totalComments: response.data.totalComments, //设置评论总数
@@ -547,6 +566,21 @@ Page({
   },
   //////////////////////////
 
+  // mark: 图片预览
+  clickImage:function(e){
+
+    // console.log(e)
+  
+      
+      var current = e.target.dataset.src;
+      // console.log(current)
+      wx.previewImage({
+        current: current, // 当前显示图片的http链接
+        urls: this.data.imagesList // 需要预览的图片http链接列表
+      })
+      // console.log(this.data.imagesList)
+    
+  },
 
   //拖动进度条事件
   sliderChange: function (e) {

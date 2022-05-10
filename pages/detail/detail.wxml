@@ -44,6 +44,25 @@
 
 
 <!-- 添加9图模块 -->
+<van-grid direction="horizontal" column-num="3" square="{{ true }}" clickable="{{ true }}">
+  <van-grid-item use-slot wx:for="{{ imagesList }}" wx:key="id">
+    <van-image
+    lazy-load
+    width="222rpx"
+    height="222rpx"
+    fit="cover"
+    src="{{ item }}"
+    data-src="{{item}}"
+    bind:click="clickImage"
+    
+/>
+
+  </van-grid-item>
+</van-grid>
+
+<view>
+
+</view>
 
 
 
