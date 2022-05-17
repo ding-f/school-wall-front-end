@@ -1,7 +1,7 @@
 import config from '../../utils/config.js'
 var Api = require('../../utils/api.js');
 var util = require('../../utils/util.js');
-var Auth = require('../../utils/auth.js'); //登录相关模块
+var Auth = require('../../utils/auth.js'); //登录模块
 // var wxApi = require('../../utils/wxApi.js')
 var wxRequest = require('../../utils/wxRequest.js')
 // const Adapter = require('../../utils/adapter.js')    //获取广告设置
@@ -118,7 +118,7 @@ Page({
     // self.getEnableComment();     // mark: 获取设置是否开启评论
     self.fetchDetailData(options.id); //获取帖子详细数据
     Auth.setUserInfoData(self); //给当前页设置用户信息
-    Auth.checkLogin(self);    //
+    Auth.checkLogin(self);    //检查微信服务器session_key是否有效，session无效||code丢失 重新设置code信息
     // mark: 119 获取广告
     // Adapter.setInterstitialAd("enable_detail_interstitial_ad");
     wx.getSystemInfo({

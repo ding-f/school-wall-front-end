@@ -1,6 +1,11 @@
-<view style="background-color:#F7F8FA;">
+<import src="../../templates/login-popup.wxml" />
 
+
+
+<view style="background-color:#F7F8FA;">
+<van-notify id="van-notify" />
 <form bindsubmit="formSubmit">
+
 <van-cell-group inset title="文字描述"> 
 
   <van-field
@@ -34,18 +39,26 @@
 </van-cell-group>
   <van-cell-group inset title="插图（最多9张，第一张图片将作为封面）">
     <van-cell>
-      <van-uploader   
+      <van-uploader  
+
+      bind:after-read="afterRead"
+      
       name="post_file_list"
+      
+      bind:before-read="before"
+      bind:delete="delOne"
+
       file-list="{{ pictureList }}" 
+      use-before-read
       
       max-size="5120"
-      upload-text="选择图片" 
-      image-fit="cover"
-      bind:after-read="afterRead" 
+      upload-text="拍照或选图" 
+      image-fit="widthFix"
+      
       multiple
       max-count="9"
-      preview-size
-      capture
+      preview-size="180rpx"
+      
       
       />
       
@@ -61,4 +74,8 @@
 </form>
 
 </view>
+
+<!-- 登录框 -->
+<template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
+
 

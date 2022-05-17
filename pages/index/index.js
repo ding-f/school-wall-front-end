@@ -277,19 +277,30 @@ Page({
                   floatDisplay: "block",    
                   postsList: self.data.postsList.concat(pageData.map(function (item) {   //concat()连接多个数组;map(Math.sqrt())映射数组的每个元素到内部函数进行计算 *设置帖子列表*/
                     
-                    var strdate = item.date   //添加一个变量，为了暂时放置变量
-                    if (item.category_name != null) {
+                    
+                    // if (item.category_name != null) {
     
-                      item.categoryImage = "../../images/category.png";   //好像没有用
-                    } else {
-                      item.categoryImage = "";
-                    }
+                    //   item.categoryImage = "../../images/category.png";   //好像没有用
+                    // } else {
+                    //   item.categoryImage = "";
+                    // }
     
+
                     if (item.postMediumImage == null || item.postMediumImage == '') {
                       item.postMediumImage = "../../images/error.jpg";
                     }
                     //使得文字显示是一个固定的范围
-                    item.date = util.cutstr(strdate, 10, 1);    //剪切字符串，为10个，1是不用加"..."
+                    item.date = util.cutstr(item.date, 10, 1);    //剪切字符串，为10个，1是不用加"..."
+
+                    //判断非文件名称就会跳过解析url
+                    if(!(item.postMediumImage.indexOf("http")==0 || item.postMediumImage.indexOf("../")==0)){
+                      let url= Api.postDownLoad(item.date,item.postMediumImage
+                        );
+
+                        item.postMediumImage=url;
+
+                    }
+
                     return item;
                   }))
                   

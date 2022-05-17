@@ -2,10 +2,13 @@
 
 import config from 'config.js';
 var domain = config.getDomain;
+var ioServer = config.getIOServer;
+
 var pageCount = config.getPostCount;
 var categoriesID = config.getCategoriesID;
 
 var HOST_URI = 'http://' + domain+'/schoolwall/'; //   https://' + domain+'/wp-json/wp/v2/
+var IO_URI = 'http://' + ioServer +'/schoolwall_fs/';
 // var HOST_URI = 'http://' + domain + '/schoolwall/'; //   https://' + domain + '/wp-json/watch-life-net/v1/
    //https://www.watch-life.net/wp-json/watch-life-net/v1/
    //https://www.watch-life.net/wp-json/wp/v2/
@@ -33,6 +36,20 @@ module.exports = {
         
     return url;
 
+  },
+
+  //文件上传到文件服务器
+  postAdd: function(filePath){
+
+    var url= IO_URI +"fileup";
+    return url;
+  },
+
+  //从文件服务器下载
+  postDownLoad:function(createDate,fileName){
+    let url=IO_URI+"createdate="+createDate+"/filename="+fileName;
+
+    return url;
   },
 
   // 获取多个分类帖子列表数据

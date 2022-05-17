@@ -27,7 +27,7 @@ Auth.checkLogin=function(appPage){
         // wx.checkSession 接口检测当前用户登录态是否有效（微信官方）
         wx.checkSession({
               success: function(){      //微信服务器的session_key未失效
-                if(!wxLoginInfo.js_code)
+                if(!wxLoginInfo.js_code)  //有可能被用户清楚了缓存
                 {
                     //查证UUID是否过期（过期重传Jwt）
                     //wxLogin()封装了wx.login()
@@ -38,11 +38,11 @@ Auth.checkLogin=function(appPage){
                     })  
                 }
               },
-              fail: function(){//实现查证Jwt是否过期（过期签证Jwt）
-                Auth.logout(appPage);
-                wx.reLaunch({
-                    url: '../index/index'
-                  });
+              fail: function(){//类似于：于查证Jwt是否过期（过期签证Jwt）
+                Auth.logout(appPage); //清除所有旧的用户信息
+                // wx.reLaunch({
+                //     url: '../index/index'
+                //   });
                  Auth.wxLogin().then(res=>{                //微信服务器的session_key失效(官方：说需重新登录小程序)
                     
                         appPage.setData({wxLoginInfo:res});
@@ -63,13 +63,19 @@ Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
             {
                 Auth.agreeGetUser(e,wxLoginInfo,authFlag).then(res=>{
                     if (res.errcode ==""){                    
-                        wx.setStorageSync('userInfo',res.userInfo);
-                        wx.setStorageSync('openid',res.openid);
-                        wx.setStorageSync('userLevel',res.userLevel);
-                        appPage.setData({openid:res.openid});
-                        appPage.setData({userInfo:res.userInfo});
-                        appPage.setData({userLevel:res.userLevel});                 
-                    
+                        wx.setStorageSync('userInfo',res.userInfo); //昵称，头像
+                        wx.setStorageSync('openid',res.openid);   //openID
+                        wx.setStorageSync('userLevel',res.userLevel); //角色
+                        appPage.setData({
+                          openid:res.openid,
+                          userInfo:res.userInfo,
+                          userLevel:res.userLevel
+                        });
+                        // // console.log(res.openid)
+                        // appPage.setData({userInfo:res.userInfo});
+                        // // console.log(res.userInfo)
+                        // appPage.setData({userLevel:res.userLevel});                 
+                        
                     }
                     else
                     {
@@ -82,15 +88,22 @@ Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
                               if (res.confirm) {
                                 Auth.logout(appPage);            
                                 Auth.checkLogin(appPage);   //推翻登录流程重头来
+                                wx.reLaunch({
+                                  url: '../readlog/readlog'
+                                });
                               
                               } else if (res.cancel) {
-                                
+                                wx.reLaunch({
+                                  url: '../index/index'
+                                });
                               }
                             }
                           })
                     
                     }
                     appPage.setData({ isLoginPopup: false });
+
+                    
 
                 })
             }
@@ -186,7 +199,7 @@ Auth.checkAgreeGetUser=function(e,app,appPage,authFlag)
 //         }) 
 // }
 
-//弹窗内用户点击同意授权触发
+//弹窗内用户点击同意授权触发（将Code，头像，昵称传递给服务器，获取OpenID）
 Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
     return new Promise(function(resolve, reject) {
        let args={};
@@ -235,14 +248,17 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
                     }
                     data.userLevel=userLevel;
                     data.errcode="";
-                    data.userId=  response.data.data.id;                      
+                    data.userId=  response.data.data.id;      
+                    
+                    
+
                     resolve(data);
 
                 }
                 else {
                     data.errcode = response.code;
                     data.message = response.msg;
-                    resolve(args);
+                    resolve(data);
                 }
             })
         },
@@ -261,6 +277,9 @@ Auth.agreeGetUser=function(e,wxLoginInfo,authFlag){
               })
             resolve(args);
           
+        },
+        complete:(com)=>{
+
         }
       });
 
