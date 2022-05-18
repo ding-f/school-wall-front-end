@@ -431,7 +431,8 @@ Page({
         //   });
         // };
         var resData=response.data;
-
+        let postdate = resData.date;
+        var cutdate=util.cutstr(postdate, 10, 1)
         var _likeCount = resData.likeCount; // mark: 419 喜欢计数
         if (resData.likeCount != '0') { //如果喜欢不为0，设置样式
           _displayLike = "block"
@@ -452,18 +453,22 @@ Page({
         logs.unshift([id, resData.title]); //加上现在获取到的[id,标题]
         wx.setStorageSync('readLogs', logs); //将这个数组覆盖掉
         
-        //设置9图列表
-        // var imageListObj=response.data.postAllImages;
-        var coverImage = resData.postMediumImage;
-
         var imageList=[];
-        imageList.push(coverImage);
 
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 0; i < 9; i++) {
+          // if(!(resData["postImage"+i].indexOf("http")==0 || resData["postImage"+i].indexOf("../")==0)){
+            
+              let url=Api.imagesDownLoad(cutdate,resData["postImage"+i]);
+              imageList.push(url);
 
-          imageList.push(resData["postImage"+i]);
+          // }else{
+            // let url=resData["postImage"+i];
+            // imageList.push(url);
+          // }
+
           
         }
+
 
         // console.log(imageList);
 
@@ -493,7 +498,7 @@ Page({
           likeCount: _likeCount, //设置点赞数
           postID: id, //设置帖子Id
           // link: response.data.link, //设置帖子链接（无数据项）
-          detailDate: util.cutstr(resData.date, 10, 1), //帖子的发布时间，只裁剪到年月日
+          detailDate: cutdate, //帖子的发布时间，只裁剪到年月日
           display: 'block',
           displayLike: _displayLike, // mark: 465 如果有喜欢数，把喜欢数设置出显示效果
           // totalComments: response.data.totalComments, //设置评论总数
@@ -1200,7 +1205,7 @@ Page({
         // var postCommentMessage = "";
         postCommentRequest
           .then(res => {
-            console.log(res)
+            // console.log(res)
             // var code = res.data.code;
             if (res.data.code == '200') {
 

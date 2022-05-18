@@ -243,8 +243,8 @@ Page({
                     var strdate = item.date;
                     
 
-                    if (item.postMediumImage == null || item.postMediumImage == '') {
-                        item.postMediumImage = '../../images/error.jpg';
+                    if (item.postImage0 == null || item.postImage0 == '') {
+                        item.postImage0 = '../../images/error.jpg';
                     }
 
                     item.date = util.cutstr(strdate, 10, 1);

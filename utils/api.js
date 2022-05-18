@@ -46,8 +46,14 @@ module.exports = {
   },
 
   //从文件服务器下载
-  postDownLoad:function(createDate,fileName){
-    let url=IO_URI+"createdate="+createDate+"/filename="+fileName;
+  imagesDownLoad:function(createDate,fileName){
+    let url=IO_URI+"filedown/createdate="+createDate+"/filename="+fileName;
+
+    return url;
+  },
+
+  postAddPost:function(){
+    let url=HOST_URI + 'postaddorup';
 
     return url;
   },
@@ -56,6 +62,12 @@ module.exports = {
   getPostsByCategories: function (categories) {
       var url = HOST_URI + 'posts?per_page=20&orderby=date&order=desc&page=1&categories=' + categories;
       return url;
+  },
+
+  //创作帖子分类列表获取
+  getAddPostCateList: function(){
+    var url=HOST_URI + 'addpostcategories'
+    return url;
   },
   
   // 获取置顶的帖子

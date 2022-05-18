@@ -286,18 +286,18 @@ Page({
                     // }
     
 
-                    if (item.postMediumImage == null || item.postMediumImage == '') {
-                      item.postMediumImage = "../../images/error.jpg";
+                    if (item.postImage0 == null || item.postImage0 == '') {
+                      item.postImage0 = "../../images/error.jpg";
                     }
                     //使得文字显示是一个固定的范围
                     item.date = util.cutstr(item.date, 10, 1);    //剪切字符串，为10个，1是不用加"..."
 
-                    //判断非文件名称就会跳过解析url
-                    if(!(item.postMediumImage.indexOf("http")==0 || item.postMediumImage.indexOf("../")==0)){
-                      let url= Api.postDownLoad(item.date,item.postMediumImage
+                     // mark: 判断非文件名称就会跳过解析url
+                    if(!(item.postImage0.indexOf("http")==0 || item.postImage0.indexOf("../")==0)){
+                      let url= Api.imagesDownLoad(item.date,item.postImage0
                         );
 
-                        item.postMediumImage=url;
+                        item.postImage0=url;
 
                     }
 

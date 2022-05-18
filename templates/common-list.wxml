@@ -18,7 +18,7 @@
 
       <!-- 帖子项 -->
       <view class="post-item" index="{{index}}" id="{{item.id}}" bindtap="redictDetail">
-        <image src="{{item.postMediumImage}}" mode="aspectFill" class="post-img"></image>
+        <image src="{{item.postImage0}}" mode="aspectFill" class="post-img"></image>
         <view class="post-desc">
           <view class="post-title">
           <!-- rendered 描述 -->

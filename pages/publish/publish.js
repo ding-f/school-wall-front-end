@@ -1,8 +1,9 @@
 // pages/publish/publish.js
-
+var wxRequest = require('../../utils/wxRequest.js')
 var Api = require('../../utils/api.js');
 import Notify from '../../miniprogram_npm/@vant/weapp/notify/notify';
-import Toast from '../../miniprogram_npm/@vant/weapp/toast/toast';
+import Dialog from '../../miniprogram_npm/@vant/weapp/dialog/dialog';
+// import Toast from '../../miniprogram_npm/@vant/weapp/toast/toast';
 
 var Auth = require('../../utils/auth.js'); //登录模块
 var app = getApp();
@@ -22,8 +23,17 @@ Page({
 
     title: '',
     content: '',
+    selectedCate: {id: 1, name: "校园生活", subname: "爱校园，爱生活~"},
     pictureList: [],
     upNameArr: [],
+
+    categoriesList: [
+          { name: '访问错误，请联系开发者。', color: '#ee0a24' },
+          { loading: true },
+
+        ],
+    showCateSheet: false,
+    arrowDirection: "left",
 
     isLoginPopup: false,
 
@@ -37,6 +47,29 @@ Page({
     Auth.setUserInfoData(self); //给当前页设置用户信息，没有就说明么有登录
     Auth.checkLogin(self); //检查微信服务器session_key是否有效，session无效||code丢失 重新设置code信息
 
+    var getAddPostCateList = wxRequest.getRequest(Api.getAddPostCateList());
+    getAddPostCateList.then(response =>{
+      var listCate=response.data.data;
+
+      //[JS高效更改对象中属性名](https://blog.csdn.net/corey_mengxiaodong/article/details/80238615)
+      listCate = JSON.parse(JSON.stringify(listCate).replace(/description/g,"subname"));
+      // console.log(listCate)
+      if(response.data.code===200){
+        this.setData({
+          categoriesList: listCate
+        });
+      }else{
+        // this.setData({
+        //   categoriesList: [
+        //     { name: '访问错误', color: '#ee0a24' },
+        //     { loading: true },
+
+        //   ]
+        // });
+      }
+      
+      // console.log(listCate)
+    });
   },
 
   /**
@@ -52,6 +85,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
+
 
   },
 
@@ -137,7 +171,7 @@ Page({
 
   },
 
-  //有赞Vant组件Bug fterRead事件不能触发
+  //有赞Vant组件Bug fterRead事件不能触发（Vant未修复Bug）
   afterRead: function (e) {
     // const { file } = e.detail;
 
@@ -156,29 +190,32 @@ Page({
     // pictureList.push({ ...file });
     // this.setData({ pictureList });
   },
-  // });
-  // },
 
-  //发布按钮点击事件
+
+  // mark: 发布按钮点击事件 
   formSubmit: function (e) {
-    // console.log(e)
-    console.info('表单提交携带数据', e.detail.value)
-
-
-    //提交内容
+    let self=this;
     var postTitle = e.detail.value.post_title;
     var postContent = e.detail.value.post_content;
-    var selectedPhotoList = this.data.pictureList;
-    console.log("已选择文件列表：" + selectedPhotoList);
+    var cateObj=self.data.selectedCate;
+    var authJwt = wx.getStorageSync('authorization');
+    //提交内容
+    var selectedPhotoList = self.data.pictureList;
 
-    //文件服务器链接
-    var addImageUrl = Api.postAdd();
+    var upNameList = self.data.upNameArr;
+    // new Promise((resolve, reject)=>{
+    // console.log(e)
+    // console.info('表单提交携带数据', e.detail.value)
+    // mark: 提交按钮------打印选择列表
+    // console.log("已选择文件列表：" + selectedPhotoList);
+
+    
     //  console.log(addImageUrl)
     //Jwt信息
-    var authJwt = wx.getStorageSync('authorization');
+    
 
     //返回一个新的图片名称列表（用于上传后端服务器存到数据库）
-    var arr = new Array();
+    
 
 
 
@@ -191,36 +228,100 @@ Page({
       Notify('发布墙贴一定要填入内容哦');
       return
     }
-    // console.log("检测内容继续执行")
-    selectedPhotoList.map(function (v, k) {
 
-      wx.uploadFile({
-        //后端提交文件接口
-        url: addImageUrl,
-        //请求体form-data，key=file
-        name: 'file',
-        //本地资源路径
-        filePath: v.url,
-        // 请求头token 
-        formData: {
-          Authorization: authJwt
-        },
-        success(res) {
-          let img = res.data
-          console.log(img)
-          arr.push(img); //返回图片的路径  并追加到新数组里面
+    //文件服务器链接
+    var addImageUrl = Api.postAdd();
+    // let dataTrans={}
 
-        }
+      var arr = [];
+      selectedPhotoList.map(function (v, k) {
 
+        wx.uploadFile({
+          //后端提交文件接口
+          url: addImageUrl,
+          //请求体form-data，key=file
+          name: 'file',
+          //本地资源路径
+          filePath: v.url,
+          // 请求头token 
+          formData: {
+            Authorization: authJwt
+          },
+          success(res) {
+            let img = res.data;
+            // console.log(img)
+            arr.push(img.toString()); //返回图片的路径  并追加到新数组里面
+          },
+          fail(err){
+  
+          },
+          complete(res){
+            
+          }
+  
+        })
+  
       })
-    })
-
+      // console.log(arr.length)
+      // dataTrans.nameArry=arr;
+      // dataTrans.cateObj=cateObj;
+      
+      // resolve(dataTrans);
+    // }).then(dataTrans=>{
+    //   console.log(dataTrans)
+      
     this.setData({
-      upNameArr: arr //在这里重新赋值，用来做删除
-    })
+      upNameArr: arr //在这里重新赋值
+    });
+     
+    setTimeout(function () {
+      let postData = {
+        title : postTitle,
+        content : postContent,
+        categoryID : cateObj.id,
+        postImage0 : arr[0],
+        postImage1 : arr[1],
+        postImage2 : arr[2],
+        postImage3 : arr[3],
+        postImage4 : arr[4],
+        postImage5 : arr[5],
+        postImage6 : arr[6],
+        postImage7 : arr[7],
+        postImage8 : arr[8]
+  
+        // photoList : arr
+      };
+  
+      let addurl=Api.postAddPost();
+      var postAddRequest = wxRequest.postRequest(addurl, postData ,authJwt);
+  
+      postAddRequest.then(res => {
+        console.log(res)
+  
 
-    console.log("名称数组：" + this.data.upNameArr);
+      });
+  }, 3000);
 
+  const beforeClose = (action) => new Promise((resolve) => {
+    setTimeout(() => {
+      if (action === 'confirm') {
+        resolve(true);
+      } else {
+        // 拦截取消操作
+        resolve(false);
+      }
+    }, 1000);
+  });
+  
+  Dialog.confirm({
+    title: '标题',
+    message: '弹窗内容',
+    beforeClose
+  });
+      
+    // });
+  
+    // console.log(upNameList.length)
   },
 
   closeLoginPopup() {
@@ -234,6 +335,7 @@ Page({
         });
 
   },
+  
   openLoginPopup() {
     this.setData({
       isLoginPopup: true
@@ -244,17 +346,30 @@ Page({
     let self= this;
     
     Auth.checkAgreeGetUser(e,app,self,'0');
-
-    let openID=this.data.openid;
-    let wxName=this.data.userInfo.nickName;
-
-    console.log(e)
-    console.log()
-
-    if(openID!==""&&openID!==null){
-      Toast('登录成功，欢迎:'+wxName);
-    }
-        
   },
 
+  clickCateCell() {
+    this.setData({ 
+      showCateSheet: true,
+      arrowDirection: "up"
+    });
+  },
+
+  //点击遮罩层关闭列表
+  onClose() {
+    this.setData({ 
+      showCateSheet: false,
+      arrowDirection: "left"
+    });
+  },
+
+  // mark: 选择列表项触发反馈信息
+  onSelect(event) {
+    // console.log(event.detail);
+    let self= this;
+    self.setData({
+      selectedCate:event.detail
+    })
+
+  },
 })

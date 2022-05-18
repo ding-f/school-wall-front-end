@@ -2,7 +2,7 @@
 
 //配置域名,域名只修改此处。
 //如果wordpress没有安装在网站根目录请加上目录路径,例如："www.watch-life.net/blog"
-var DOMAIN = "124.221.205.13";
+var DOMAIN = "0.0.0.0:3000";
 var IOSERVER = "0.0.0.0:2121";
 var BLOG = "https://ding-f.gitee.io/";  //私人博客
 var WEBSITENAME="安康学院校园墙";   //站名称

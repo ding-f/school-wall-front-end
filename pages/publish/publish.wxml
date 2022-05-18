@@ -6,7 +6,7 @@
 <van-notify id="van-notify" />
 <form bindsubmit="formSubmit">
 
-<van-cell-group inset title="文字描述"> 
+<van-cell-group inset title="创作你的创作"> 
 
   <van-field
     name="post_title"
@@ -14,7 +14,7 @@
     label="标题"
     type="textarea"
     placeholder="请输入标题"
-    
+    required
     show-word-limit
     maxlength="66"
     right-icon="flower-o"
@@ -33,10 +33,27 @@
     show-word-limit
     maxlength="666"
     right-icon="records"
-    
+    required
     size="large"
   />
+
+
 </van-cell-group>
+
+<van-cell-group inset title="选择墙贴类型（默认分类：校园生活）" > 
+  <van-cell icon="apps-o"
+  title="{{selectedCate.name}}" 
+  label="{{selectedCate.subname}}"
+  is-link 
+  
+  arrow-direction="{{arrowDirection}}"
+    bind:click="clickCateCell"
+    center
+    required
+    
+     />
+</van-cell-group>
+
   <van-cell-group inset title="插图（最多9张，第一张图片将作为封面）">
     <van-cell>
       <van-uploader  
@@ -63,7 +80,10 @@
       />
       
     </van-cell>
+    
   </van-cell-group>
+
+ 
 
   <van-cell-group inset title="点击发布墙贴">
   
@@ -71,11 +91,25 @@
   
   </van-cell-group>
 
+
+
 </form>
 
 </view>
 
 <!-- 登录框 -->
 <template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
+
+<!-- 分类列表 -->
+<van-action-sheet
+title="墙贴分类"
+  show="{{ showCateSheet }}"
+  actions="{{ categoriesList }}"
+  bind:close="onClose"
+  bind:select="onSelect"
+  
+/>
+
+<van-dialog id="van-dialog" />
 
 
