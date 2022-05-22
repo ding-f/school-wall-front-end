@@ -240,14 +240,21 @@ Page({
                 floatDisplay: "block",
                 showallDisplay: "block",
                 postsList: self.data.postsList.concat(pageList.map(function (item) {
-                    var strdate = item.date;
-                    
+                    // var strdate = ;
+                    item.date = util.cutstr(item.date, 10, 1);
 
                     if (item.postImage0 == null || item.postImage0 == '') {
                         item.postImage0 = '../../images/error.jpg';
                     }
+                    //判断校园墙服务器图片
+                    if(!(item.postImage0.indexOf("http")==0 || item.postImage0.indexOf("../")==0)){
+                      let url= Api.imagesDownLoad(item.date,item.postImage0
+                        );
 
-                    item.date = util.cutstr(strdate, 10, 1);
+                        item.postImage0=url;
+                    }
+
+                    
                     return item;
                 }))
 

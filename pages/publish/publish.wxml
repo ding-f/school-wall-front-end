@@ -6,7 +6,7 @@
 <van-notify id="van-notify" />
 <form bindsubmit="formSubmit">
 
-<van-cell-group inset title="创作你的创作"> 
+<van-cell-group inset title="创作你的创作（完美支持 MarkDown）"> 
 
   <van-field
     name="post_title"
@@ -110,6 +110,8 @@ title="墙贴分类"
   
 />
 
-<van-dialog id="van-dialog" />
+<van-dialog id="van-dialog"
+
+ />
 
 

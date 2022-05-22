@@ -167,6 +167,21 @@ Page({
 
   },
   onShow: function () {
+    var self = this;
+    self.setData({
+      showerror: "none",       
+      floatDisplay: "none",
+      isLastPage: false,
+      page: 1,
+      postsShowSwiperList: [],
+      listAdsuccess:false //不显示广告
+
+    });
+    this.getHomeconfig();
+    this.fetchPostsData(self.data);
+
+
+
     this.getTabBar().init();
     wx.setStorageSync('openLinkCount', 0);
 
@@ -315,7 +330,7 @@ Page({
                     isLoading: false
                   });
                   wx.showToast({
-                    title: '没了别拉了 😂',
+                    title: '我估计加载完了',
                     mask: false,
                     duration: 1666
                   });

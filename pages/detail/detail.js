@@ -457,15 +457,17 @@ Page({
 
         for (let i = 0; i < 9; i++) {
           // if(!(resData["postImage"+i].indexOf("http")==0 || resData["postImage"+i].indexOf("../")==0)){
+            let fileName=resData["postImage"+i];
+            if(fileName=='../../images/error.jpg' || fileName==undefined || fileName=='' || fileName==null) continue;
             
-              let url=Api.imagesDownLoad(cutdate,resData["postImage"+i]);
+              let url= Api.imagesDownLoad(cutdate,fileName);
+              // console.log(fileName)
               imageList.push(url);
-
+ 
           // }else{
             // let url=resData["postImage"+i];
             // imageList.push(url);
           // }
-
           
         }
 

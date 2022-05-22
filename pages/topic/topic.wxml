@@ -13,8 +13,8 @@
           <text>{{item.name}}</text>
         </view>
         <view class="btn-box">
-        <!-- data-subflag="{{item.subflag}}"  -->
-          <image src="../../images/{{subimg}}" data-id="{{item.id}}" catchtap="postsub"></image>
+        <!--   -->
+          <image src="../../images/{{item.subTab==1 ? 'subscription-on.png' : 'subscription.png'}}" data-id="{{item.id}}" data-subflag="{{item.subTab}}" catchtap="postsub"></image>
         </view>
       </view>
       <view class="topic-conut" data-item="{{item.name}}" data-id="{{item.id}}">

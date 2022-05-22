@@ -203,20 +203,6 @@ Page({
     var selectedPhotoList = self.data.pictureList;
 
     var upNameList = self.data.upNameArr;
-    // new Promise((resolve, reject)=>{
-    // console.log(e)
-    // console.info('表单提交携带数据', e.detail.value)
-    // mark: 提交按钮------打印选择列表
-    // console.log("已选择文件列表：" + selectedPhotoList);
-
-    
-    //  console.log(addImageUrl)
-    //Jwt信息
-    
-
-    //返回一个新的图片名称列表（用于上传后端服务器存到数据库）
-    
-
 
 
     if (postTitle === null || postTitle === "") {
@@ -228,6 +214,12 @@ Page({
       Notify('发布墙贴一定要填入内容哦');
       return
     }
+
+
+  const beforeClose = (action) => new Promise((resolve) => {
+    setTimeout(() => {
+      if (action === 'confirm') {
+        resolve(true);
 
     //文件服务器链接
     var addImageUrl = Api.postAdd();
@@ -262,13 +254,6 @@ Page({
         })
   
       })
-      // console.log(arr.length)
-      // dataTrans.nameArry=arr;
-      // dataTrans.cateObj=cateObj;
-      
-      // resolve(dataTrans);
-    // }).then(dataTrans=>{
-    //   console.log(dataTrans)
       
     this.setData({
       upNameArr: arr //在这里重新赋值
@@ -278,7 +263,7 @@ Page({
       let postData = {
         title : postTitle,
         content : postContent,
-        categoryID : cateObj.id,
+        categoryId : cateObj.id,
         postImage0 : arr[0],
         postImage1 : arr[1],
         postImage2 : arr[2],
@@ -298,30 +283,34 @@ Page({
       postAddRequest.then(res => {
         console.log(res)
   
-
       });
-  }, 3000);
+      wx.reLaunch({
+        url: '../index/index',
+      })
 
-  const beforeClose = (action) => new Promise((resolve) => {
-    setTimeout(() => {
-      if (action === 'confirm') {
-        resolve(true);
+  },1000);    //等待9秒后文件服务器才能返回全部图片名称，再等待1秒写入信息到数据库,并返回主页
+
+        
       } else {
+        
         // 拦截取消操作
         resolve(false);
+        
       }
-    }, 1000);
+    }, 9000); //图片上传给9秒时间
   });
-  
+
   Dialog.confirm({
-    title: '标题',
-    message: '弹窗内容',
-    beforeClose
+    title: '墙贴即将发布',
+    message: '墙君将刻出你的文案，渲染美丽的图片，等待10秒 ？',
+    
+    confirmButtonText : "确认发布",
+
+closeOnClickOverlay : true,
+showCancelButton: false,
+beforeClose
   });
-      
-    // });
-  
-    // console.log(upNameList.length)
+  // console.log("异步测试")
   },
 
   closeLoginPopup() {

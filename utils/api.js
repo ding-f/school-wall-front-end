@@ -148,9 +148,9 @@ module.exports = {
   },
 
   // mark: 获取分类列表（部分实现）
-  getCategories: function (ids,openid) {
+  getCategories: function (openid) {
       var url ='';
-      if (ids ==''){
+      if (openid ==''){
         //未登录获取墙贴分类
         url = HOST_URI + 'categories'
 
@@ -161,11 +161,21 @@ module.exports = {
       else
       {
         //登录获取墙贴分类并且显示点亮订阅按钮
-          url = HOST_URI + 'categories?include=' + ids+'&orderby=count&order=desc&openid='+openid;
+          url = HOST_URI + 'getsubcategories/byuser';
  
       }
    
     return url
+  },
+
+  // mark: 获取分类（无用）
+  getCategoriesIds(){
+
+    // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
+    var url = HOST_URI;
+      url += "category/ids";
+      return url;
+
   },
 
   // mark: 根据ID获取某个分类信息(已实现)
@@ -339,7 +349,7 @@ module.exports = {
       return url;
   },
 
-  //订阅的分类
+  //点击订阅
   postSubscription() {
       var url = HOST_URI;
       url += "category/postsubscription";
@@ -376,15 +386,7 @@ module.exports = {
 
   },
 
-  // mark: 获取分类
-  getCategoriesIds(){
-
-    // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
-    var url = HOST_URI;
-      url += "category/ids";
-      return url;
-
-  },
+  
   getliveinfo(){
     var url = HOST_URI;
       url += "live/getliveinfo";

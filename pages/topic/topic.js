@@ -23,7 +23,7 @@ Page({
         webSiteName:webSiteName,
         blog:blog,
 
-    subimg: "subscription.png"        
+        // subimg: "subscription.png"        
     },
 
 
@@ -51,6 +51,14 @@ Page({
       this.getTabBar().init();
     },
 
+    onPullDownRefresh: function(){
+      var self = this;
+      // self.setData({
+      //   categoriesList : {},
+      // });
+      self.fetchCategoriesData();
+
+    },
     // mark: 获取分类列表方法
     fetchCategoriesData: function () {
         var self = this;        
@@ -60,19 +68,21 @@ Page({
         //console.log(Api.getCategories());
         // https://www.watch-life.net/wp-json/watch-life-net/v1/category/ids
 
-        // mark: 订阅点亮（待实现）
+       
         // var getCategoriesIdsRequest = wxRequest.getRequest(Api.getCategoriesIds());     //请求获取分类列表API
         // getCategoriesIdsRequest.then(res=>{
             
 
-            var ids="";     //订阅功能的参数，根据ID点亮订阅按钮
-            var openid= self.data.openid;
+            // var ids="";     //订阅功能的参数，根据ID点亮订阅按钮
+
+            var openid= self.data.openid;   //如果有说明已经登录小程序
 
         //     if(!res.data.Ids=="")
         //     {
         //         ids=res.data.Ids;
         //     }
-            var getCategoriesRequest = wxRequest.getRequest(Api.getCategories(ids,openid));
+            var authJwt = wx.getStorageSync('authorization');
+            var getCategoriesRequest = wxRequest.getRequest(Api.getCategories(openid),'',authJwt);
                 getCategoriesRequest.then(response => {
                     // console.log(response)
                     if (response.statusCode === 200) {
@@ -83,9 +93,12 @@ Page({
                                     item.categoryThumbnailImage = "../../images/error.jpg";
                                 
                                 }
-                            
-                                
-                                 
+                                // if(item.subTab=1){
+                                //   item.subimg="subscription-on.png";
+                                // }else{
+                                //   item.subimg="subscription.png";
+                                // }
+
                                 return item;
                             })),
                         });
@@ -145,16 +158,20 @@ Page({
             var categoryid = e.currentTarget.dataset.id;
             var openid = self.data.openid;
             var url = Api.postSubscription();
-            var subflag = e.currentTarget.dataset.subflag;
+            var subflag = e.currentTarget.dataset.subflag;  //已订阅标识
             var data = {
-                categoryid: categoryid,
-                openid: openid
+                categoryId: categoryid,
+                openId: openid,
+                subTab:subflag
             };
 
-            var postSubscriptionRequest = wxRequest.postRequest(url, data);
+            var authJwt = wx.getStorageSync('authorization');
+            var postSubscriptionRequest = wxRequest.postRequest(url, data,authJwt);
             postSubscriptionRequest.then(response => {
-                if (response.statusCode === 200) {
-                    if (response.data.status == '200') {
+              
+                if (response.data.code === 200) {
+                  //触发订阅
+                    if (response.data.msg == 'subed') {
                         setTimeout(function () {
                             wx.showToast({
                                 title: '订阅成功',
@@ -165,19 +182,20 @@ Page({
                                 }
                             });
                         }, 900);
-                        var subimg = "";
+                        // var subimg = "";
                         if (subflag == "0") {
                             subflag = "1";
-                            subimg = "subscription-on.png"
+                            // subimg = "subscription-on.png"
                         }
                         else {
                             subflag = "0";
-                            subimg = "subscription.png"
+                            // subimg = "subscription.png"
                         }
-                        self.reloadData(categoryid, subflag, subimg);
+                        self.reloadData(categoryid, subflag);
 
                     }
-                    else if (response.data.status == '201') {
+                    //触发取消订阅
+                    else if (response.data.msg == 'unsub') {
                         setTimeout(function () {
                             wx.showToast({
                                 title: '取消订阅成功',
@@ -187,16 +205,16 @@ Page({
                                 }
                             });
                         }, 900);
-                        var subimg = "";
-                        if (subflag == "0") {
-                            subflag = "1";
-                            subimg = "subscription-on.png"
+                        // var subimg = "";
+                        if (subflag == "1") {
+                            subflag = "0";
+                            // subimg = "subscription-on.png"
                         }
                         else {
-                            subflag = "0";
-                            subimg = "subscription.png"
+                            subflag = "1";
+                            // subimg = "subscription.png"
                         }
-                        self.reloadData(categoryid, subflag, subimg);
+                        self.reloadData(categoryid, subflag);
 
                     }
                     else if (response.data.status == '501' || response.data.status == '501') {
@@ -233,14 +251,16 @@ Page({
             })
         }
     },
-    reloadData: function (id, subflag, subimg) {
+
+    // mark: 订阅列表重载
+    reloadData: function (id, subTab) {
         var self = this;
         var newCategoriesList = [];
         var categoriesList = self.data.categoriesList;
         for (var i = 0; i < categoriesList.length; i++) {
             if (categoriesList[i].id == id) {
-                categoriesList[i].subflag = subflag;
-                categoriesList[i].subimg = subimg;
+                categoriesList[i].subflag = subTab;
+                
             }
             newCategoriesList.push(categoriesList[i]);
         }
@@ -249,6 +269,7 @@ Page({
             self.setData({
                 categoriesList: newCategoriesList
             });
+            self.onPullDownRefresh();
 
         }
 

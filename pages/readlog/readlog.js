@@ -331,7 +331,7 @@ Page({
           self.setData({
               readLogs: []
           });
-          var url = Api.getSubscription() + '?openid=' + openid;
+          var url = Api.getSubscription() + '/openid=' + openid;
           var getMysubPost = wxRequest.getRequest(url);              
           getMysubPost.then(response => {
               if (response.statusCode == 200) {
