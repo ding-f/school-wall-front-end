@@ -31,9 +31,9 @@
     <block wx:if="{{openid !=''}}">
       <scan-login />
     </block>
-    
+
   </view>
-    
+
 </view>
 <!-- tab选项卡 -->
 <view class="tab-bar">
@@ -45,13 +45,38 @@
 </view>
 <!-- 帖子列表 -->
 <view class="list_container">
-  <block wx:key="id" wx:for="{{readLogs}}">
-    <view class="list-item" index="{{index}}" id="{{item[0]}}" data-itemtype="{{item[2]}}" catchtap="redictDetail">
-      <text>{{index + 1}}. {{item[1]}}</text>
-    </view>
+  <view style="display: {{showList}}">
+    <block wx:key="index" wx:for="{{readLogs}}">
+      
+      <van-cell id="{{item.id}}" index="{{index}}" title="{{item.title}}" title-width="200" value="{{item.wxName}}" label="发布于:{{item.date}}" clickable catchtap="redictDetail" />
+
+      
+    </block>
+  </view>
+
+  <!-- 评论列表 -->
+  <van-collapse value="{{activeNames}}" style="display: {{showCommentList}}" bind:change="onChange">
+    <block wx:key="index" wx:for="{{myComments}}">
+      <van-collapse-item index="{{index}}" size="large" clickable title="我 评论 {{item.wxName}}" name="{{index}}" label="评论于:{{item.sonReplyDate}} " >
+        <view  data-from="{{item.from}}" data-cid="{{item.id}}" catchtap="redictDetail" data-comment="{{item.content}}" catchlongtap="longTapMyComment" id="{{item.postId}}">
+      {{item.content}}
+      <text style="color: tomato;"> [长按删除]</text>
+      </view>
+
+      
+      
+      </van-collapse-item>
+    </block>
+  </van-collapse>
+  <!-- <view style="display: {{showCommentList}};">
+  <block wx:for="{{myComments}}" >
+  
   </block>
+  </view> -->
+  <!-- 确认删除弹窗 -->
+  <van-dialog id="van-dialog" />
   <!-- 没有帖子时的提示信息 -->
-  <view class="tips" style="display:{{shownodata}}">还没有相关帖子哟~</view>
+  <view class="tips" style="display:{{shownodata}}">💝 口袋空空 💝</view>
   <!-- 登录框 -->
   <template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
   <!-- 无法访问网络 -->
@@ -61,6 +86,6 @@
   </view>
   <!-- 版权信息 -->
   <view class="copyright" style="display:{{(shownodata === 'none') ? 'block' : 'none'}}">
-    <template is="tempCopyright" data="{{webSiteName:webSiteName,domain:domain}}" />
+    <template is="tempCopyright" data="{{webSiteName:webSiteName,blog:blog}}" />
   </view>
 </view>

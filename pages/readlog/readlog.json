@@ -1,6 +1,13 @@
 {
-  "navigationBarTitleText": "",
+  "navigationBarTitleText": "我的",
   "usingComponents": {
-    "scan-login": "/components/scan-login/scan-login"
+    "scan-login": "/components/scan-login/scan-login",
+    
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-collapse": "@vant/weapp/collapse/index",
+    "van-collapse-item": "@vant/weapp/collapse-item/index",
+    "van-dialog": "@vant/weapp/dialog/index"
+
   }
 }

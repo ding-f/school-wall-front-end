@@ -137,7 +137,7 @@
   text-align: center;
   color: #c4c4c4;
   margin-top: 48rpx;
-  padding-bottom: 80rpx;
+  padding-bottom: 180rpx;
 }
 
 .common-gap {

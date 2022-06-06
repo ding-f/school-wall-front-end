@@ -16,7 +16,7 @@
 
 <!-- 轮播图 -->
   <swiper indicator-dots="true" interval="10000" autoplay="true" indicator-color="rgba(0, 0, 0, .1)" indicator-active-color="rgba(0, 0, 0, .6)">
-    <block wx:key="id" wx:for="{{swipe_nav}}">
+    <block wx:key="index" wx:for="{{swipe_nav}}">
       <swiper-item  wx:if="{{item.enable=='1'}}" id="{{item.id}}" index="{{index}}" data-type="{{item.type}}" data-appid="{{item.appid}}" data-path="{{item.path}}" data-url="{{item.url}}"  bindtap="redictAppDetail">
       
         <image mode="aspectFill" src="{{item.image}}" />

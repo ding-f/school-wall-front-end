@@ -2,24 +2,27 @@
  * 
  
  */
-import config from '../../utils/config.js'
+import config from '../../utils/config.js';
+import Dialog from '../../miniprogram_npm/@vant/weapp/dialog/dialog';
 var Api = require('../../utils/api.js');
 var util = require('../../utils/util.js');
 var Auth = require('../../utils/auth.js');
 
-var wxApi = require('../../utils/wxApi.js')
+var util = require('../../utils/util.js');
 var wxRequest = require('../../utils/wxRequest.js');
 var app = getApp();
 var webSiteName= config.getWebsiteName;
-var domain =config.getDomain
+var blog =config.getBlog;
+
 
 Page({
 
   data: {    
     readLogs: [],
+    myComments: [],
     topBarItems: [
         // id name selected 选中状态
-        { id: '1', name: '浏览', selected: true },
+        { id: '1', name: '历史', selected: true },
         { id: '2', name: '评论', selected: false},
         { id: '3', name: '点赞', selected: false },
         { id: '4', name: '鼓励', selected: false },
@@ -29,13 +32,17 @@ Page({
     tab: '1',
     showerror: "none",
     shownodata:"none",
+    showList: "block",
+    showCommentList:"none",
+    activeNames: ['1'],
+    lock: false,    //解决长按与点击Bug
     subscription:"",
     userInfo:{},
     userLevel:{},
     openid:'',
     isLoginPopup: false ,
     webSiteName:webSiteName,
-    domain:domain 
+    blog:blog
   },
 
   /**
@@ -140,9 +147,15 @@ Page({
 
   },
 
-  // 跳转至查看帖子详情
+  // 点击跳转至查看帖子详情
   redictDetail: function (e) {
-    // console.log('查看帖子');
+    //解决点击长按Bug
+    if(this.data.lock){
+      this.data.lock=false;
+      return;
+    }
+
+
     var id = e.currentTarget.id;
     var itemtype = e.currentTarget.dataset.itemtype;
     var url ="";
@@ -160,6 +173,31 @@ Page({
       url: url
     })
   },
+  //长按点击
+  longTapMyComment(v){
+    //解决点击长按Bug
+    this.data.lock=true;
+    console.log("长按我的评论")
+    console.log(v)
+
+    var set = v.currentTarget.dataset;
+    Dialog.confirm({
+      title: '确认删除此评论？',
+      message: set.comment,
+    })
+      .then(() => {
+        // on confirm
+        let replyId=set.cid;
+        let from=set.from;
+
+        console.log("删除"+replyId + "来自" +from)
+        
+      })
+      .catch(() => {
+        // on cancel
+      });
+  },
+  
   onTapTag: function (e) {
       var self = this;
       var tab = e.currentTarget.id;
@@ -216,42 +254,59 @@ Page({
            return;
         }
 
-
       }
+       // mark: 历史列表
       if (tab == '1')
       {
+        var readHis=wx.getStorageSync('readLogs');
           self.setData({
-              readLogs: (wx.getStorageSync('readLogs') || []).map(function (log) {
+              readLogs: (readHis || []).map(function (log) {
                   count++;
                   return log;
               })
           });
           if (count == 0) {
               self.setData({
-                  shownodata: 'block'
+                  shownodata: 'block',
+                  showList: 'none',
+
               });
+          }else{
+            self.setData({
+              showList: 'block',
+              showCommentList: 'none',
+          });
           }
       }
+      // mark: 评论列表
       else if (tab == '2')
        {
           self.setData({
-              readLogs: []
+              readLogs: [],
+              myComments: [],
+              
+              showList: "none",
           });
-          var getMyCommentsPosts = wxRequest.getRequest(Api.getWeixinComment(openid));
+          var authJwt=wx.getStorageSync('authorization');
+          var getMyCommentsPosts = wxRequest.getRequest(Api.getWeixinComment(),'',authJwt);
               getMyCommentsPosts.then(response => {
+                console.log(response) // mark: xxx
+                var myCommentsList=response.data.data;
                   if (response.statusCode == 200) {
                       self.setData({
-                          readLogs: self.data.readLogs.concat(response.data.data.map(function (item) {
-                              count++;
-                              item[0] = item.post_id;
-                              item[1] = item.post_title;
-                              return item;
-                          }))
+                        myComments: myCommentsList
                       });
-                      if (count == 0) {
+                      if (myCommentsList.length == 0) {
                           self.setData({
-                              shownodata: 'block'
+                              shownodata: 'block',
+                             
+                              showCommentList: 'none',
                           });
+                      }else{
+                        self.setData({
+                          showList: "none",
+                          showCommentList: "block"
+                        })
                       }
                   }
                   else {
@@ -263,6 +318,7 @@ Page({
                   }
               })
       }
+      //点赞
       else if (tab == '3') {
           self.setData({
               readLogs: []
@@ -284,7 +340,12 @@ Page({
                       self.setData({
                           shownodata: 'block'
                       });
-                  } 
+                  } else{
+                    self.setData({
+                      showList: 'block',
+        
+                  });
+                  }
               }
               else {
                   console.log(response);
@@ -296,6 +357,7 @@ Page({
           })
 
       }
+      // 鼓励
         else if (tab == '4') {
           self.setData({
             readLogs: []
@@ -317,7 +379,12 @@ Page({
                       self.setData({
                           shownodata: 'block'
                       });
-                  } 
+                  } else{
+                    self.setData({
+                      showList: 'block',
+        
+                  });
+                  }
               }
               else {
                   console.log(response);
@@ -327,31 +394,45 @@ Page({
               }
           })
     }
+    // mark: 订阅表实现
       else if (tab == '5') {
           self.setData({
               readLogs: []
           });
-          var url = Api.getSubscription() + '/openid=' + openid;
-          var getMysubPost = wxRequest.getRequest(url);              
+          var authJwt = wx.getStorageSync('authorization');
+          var url = Api.getSubscription() 
+          //+ '/openid=' + openid;
+          var getMysubPost = wxRequest.getRequest(url,'',authJwt);              
           getMysubPost.then(response => {
               if (response.statusCode == 200) {
-                  var usermetaList = response.data.usermetaList;
+                  var usermetaList = response.data.data;
+                  // console.log(usermetaList);
                   if (usermetaList)
                   {
                       self.setData({
-                          readLogs: self.data.readLogs.concat(usermetaList.map(function (item) {
-                              count++;
-                              item[0] = item.ID;
-                              item[1] = item.post_title;
-                              item[2] = "0";
-                              return item;
-                          }))
+                          readLogs: usermetaList.filter(v=>{
+                            //剪贴显示年月日
+                            // v.date = util.cutstr(v.date, 10, 1);    //剪切字符串，为10个，1是不用加"..."
+                            count++;
+                            // 去除数组空元素
+
+                            
+                            return v; 
+                          })
                       });
+                      // console.log(usermetaList)
                   }
+
                   if (count == 0) {
                       self.setData({
-                          shownodata: 'block'
+                          shownodata: 'block',
+                          showList: 'none',
                       });
+                  }else{
+                    self.setData({
+                      showList: 'block',
+                      showCommentList: 'none',
+                  });
                   }
               }
               else {
@@ -408,8 +489,12 @@ Page({
   },
   openLoginPopup() {
       this.setData({ isLoginPopup: true });
-  }
-  ,
+  },
+  onChange(event) {
+    this.setData({
+      activeNames: event.detail,
+    });
+  },
   confirm: function () {
         this.setData({
             'dialog.hidden': true,

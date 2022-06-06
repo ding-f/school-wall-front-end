@@ -45,7 +45,7 @@ module.exports = {
     return url;
   },
 
-  //从文件服务器下载
+  //拼接文件服务器下载地址链接
   imagesDownLoad:function(createDate,fileName){
     let url=IO_URI+"filedown/createdate="+createDate+"/filename="+fileName;
 
@@ -134,7 +134,7 @@ module.exports = {
 
     // http://0.0.0.0:3000/schoolwall/posts/id={}
     // https://www.watch-life.net/wp-json/watch-life-net/v1/posts/<id>
-    return HOST_URI + 'getpost/id=' + id;
+    return HOST_URI + 'getpostinfo/id=' + id;
   },
   // 获取页面列表数据
   getPages: function () {
@@ -223,16 +223,16 @@ module.exports = {
     return HOST_URI + 'comments'
   }, 
 
-  // mark: 提交微信评论（未实现）Post方式
+  // mark: 提交微信评论Post方式
   postWeixinComment: function () {
     var url = HOST_URI;
     return url + 'comment/reply'
   }, 
 
   //获取微信评论
-  getWeixinComment: function (openid) {
+  getWeixinComment: function () {
       var url = HOST_URI;
-      return url + 'comment/get?openid=' + openid;
+      return url + 'my/comments';
   },    
 
   //获取帖子的第一个图片地址,如果没有给出默认图片
@@ -345,7 +345,7 @@ module.exports = {
   //获取订阅的分类
   getSubscription() {
       var url = HOST_URI;
-      url += "category/getsubscription";
+      url += "category/getall/subscription";
       return url;
   },
 

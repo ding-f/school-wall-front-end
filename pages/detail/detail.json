@@ -4,11 +4,14 @@
     "usingComponents": {
         "poster": "../../templates/components/wxa-plugin-canvas-poster/poster/index",
         "mp-html": "/components/mp-html/index",
-        
+        "van-icon": "@vant/weapp/icon/index",
         "van-button": "@vant/weapp/button/index",
         "van-grid": "@vant/weapp/grid/index",
         "van-grid-item": "@vant/weapp/grid-item/index",
-        "van-image": "@vant/weapp/image/index"
+        "van-image": "@vant/weapp/image/index",
+        "van-dialog": "@vant/weapp/dialog/index",
+        "van-cell": "@vant/weapp/cell/index",
+         "van-cell-group": "@vant/weapp/cell-group/index"
           
     }
 }

@@ -1,4 +1,3 @@
-
 <import src="../../templates/copyright.wxml" />
 <import src="../../templates/loading.wxml" />
 <import src="../../templates/modal-view/modal-view.wxml" />
@@ -7,8 +6,8 @@
 
 
 <view>
-<!-- 小程序广告 -->
-      <!-- <view class="ad-box" wx:if="{{detail.detailAdId !='' && detail.detailAd=='1' && detailTopAdsuccess}}">
+  <!-- 小程序广告 -->
+  <!-- <view class="ad-box" wx:if="{{detail.detailAdId !='' && detail.detailAd=='1' && detailTopAdsuccess}}">
         <ad unit-id="{{detail.detailAdId}}" ad-intervals="30" ad-type="video" binderror="adTopbinderror"></ad>
       </view> -->
 
@@ -16,8 +15,14 @@
   <view class="detail-content" style="display:{{display}}">
     <!-- 标题 删除结尾的.rendered-->
     <view class="entry-title">{{detail.title}}</view>
+    <!-- 作者信息 -->
+    <view data-ainfo="{{authorInfo}}" bindtap="authorShow"  >
+      <van-icon name="user-o" color="#168fff" /> <text> {{authorInfo.wxName}}</text>
+    </view>
+
     <!-- 帖子互动数据 -->
     <view class="entry-data">
+
       <image src="../../images/calendar.png"></image>
       <text>{{detailDate}}</text>
       <image src="../../images/comments.png"></image>
@@ -28,11 +33,11 @@
       <text>{{likeCount}}</text>
     </view>
     <!-- 帖子正文 -->
-    <view class="entry-summary" id="entry-summary" style="height:{{detailSummaryHeight}}">       
+    <view class="entry-summary" id="entry-summary" style="height:{{detailSummaryHeight}}">
 
-     <mp-html content="{{ detail.content }}" bindlinktap="wxParseTagATap" copy-link="{{false}}" selectable="{{true}}" lazy-load="{{true}}" markdown="{{true}}" />
+      <mp-html content="{{ detail.content }}" bindlinktap="wxParseTagATap" copy-link="{{false}}" selectable="{{true}}" lazy-load="{{true}}" markdown="{{true}}" />
       <!-- 阅读更多 -->
-        <!-- <view class="detail-read-more" wx:if="{{detailSummaryHeight != ''}}">
+      <!-- <view class="detail-read-more" wx:if="{{detailSummaryHeight != ''}}">
           <view class="detail-readmore-mask">
             <view class="detail-readmore-btn" bindtap="readMore">观看视频，阅读更多...</view>
           </view>
@@ -40,40 +45,31 @@
 
     </view>
 
-    
 
 
-<!-- 添加9图模块 -->
-<van-grid direction="horizontal" column-num="3" square="{{ true }}" clickable="{{ true }}">
-  <van-grid-item use-slot wx:for="{{ imagesList }}" wx:key="id">
-    <van-image
-    lazy-load
-    width="222rpx"
-    height="222rpx"
-    fit="cover"
-    src="{{ item }}"
-    data-src="{{item}}"
-    bind:click="clickImage"
-    
-/>
 
-  </van-grid-item>
-</van-grid>
+    <!-- 添加9图模块 -->
+    <van-grid direction="horizontal" column-num="3" square="{{ true }}" clickable="{{ true }}">
+      <van-grid-item use-slot wx:for="{{ imagesList }}" wx:key="id">
+        <van-image lazy-load width="222rpx" height="222rpx" fit="cover" src="{{ item }}" data-src="{{item}}" bind:click="clickImage" />
 
-<view>
+      </van-grid-item>
+    </van-grid>
 
-</view>
+    <view>
+
+    </view>
 
 
 
     <!--  上下文  -->
     <!-- <view wx:if="{{detail.previous_post_id || detail.next_post_id}}" class="up-down-post"> -->
-      <!-- 上一篇 -->
-      <!-- <view wx:if="{{detail.previous_post_id}}" class="up-post">
+    <!-- 上一篇 -->
+    <!-- <view wx:if="{{detail.previous_post_id}}" class="up-post">
         <navigator url="../detail/detail?id={{detail.previous_post_id}}" open-type="redirect" hover-class="relatedNavigator">上一篇：{{detail.previous_post_title}}</navigator>
       </view> -->
-      <!-- 下一篇 -->
-      <!-- <view wx:if="{{detail.next_post_id}}" class="down-post">
+    <!-- 下一篇 -->
+    <!-- <view wx:if="{{detail.next_post_id}}" class="down-post">
         <navigator url="../detail/detail?id={{detail.next_post_id}}" open-type="redirect" hover-class="relatedNavigator">{{detail.next_post_title}}：下一篇</navigator>
       </view> -->
     <!-- </view> -->
@@ -82,7 +78,7 @@
     <!-- <view class="ad-box-video" wx:if="{{detail.videoAdId !='' && detail.detailAd=='1' && detailAdsuccess}}">
       <ad unit-id="{{detail.videoAdId}}" ad-intervals="30" ad-type="video" binderror="adbinderror"></ad>
     </view> -->
-     
+
 
     <!-- 猜你喜欢 -->
     <!-- <view wx:if="{{postList.length != 0}}" class="relatedPost" style="display:{{display}}">
@@ -97,27 +93,27 @@
 
     <!-- 点个赞 -->
     <view class="likePost" style="display:{{displayLike}}">
-      
+
       <view class="subTitle">送个心？</view>
-      
+
       <view class="subTitle_line"></view>
 
-  <view class="comment-btn">
-      
-    
-      <view class="likeTitle">
-        <text>{{likeCount}}人已赞</text>
-      </view>
-      <view class="like-btn-icon">
-        <image src="../../images/like-on.png" class="img-like" id="liketop" ></image>
-      </view>
+      <view class="comment-btn">
 
-      <van-button round size="small" type="primary" bindtap="commentPage">评论本帖</van-button>
-    
-  </view>
+
+        <view class="likeTitle">
+          <text>已获得{{likeCount}}颗❤️ </text>
+        </view>
+        <!-- <view class="like-btn-icon">
+        <image src="../../images/like-on.png" class="img-like" id="liketop" ></image>
+      </view> -->
+
+        <van-button round size="small" type="primary" bindtap="commentPage">评论本帖</van-button>
+
+      </view>
       <view class="likeText">
         <block wx:key="id" wx:for="{{likeList}}">
-          <image src="{{item}}" class="like-gravatar"></image>
+          <image src="{{item.wxAvatarUrl}}" class="like-gravatar" data-info="{{item}}"  bindtap="userShow"></image>
         </block>
       </view>
     </view>
@@ -139,20 +135,20 @@
         <view class="comment-user">
           <image src="{{item.avatarUrl}}" class="comment-gravatar"></image>
           <view class="comment-user-right">
-          <!-- data-userid="{{item.userid}}" data-formId="{{item.formId}}" -->
-          <!-- 点击网名可回复 -->
-            <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}" >{{item.nickName}}</view>
+            <!-- data-userid="{{item.userid}}" data-formId="{{item.formId}}" -->
+            <!-- 点击网名可回复 -->
+            <view bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}">{{item.nickName}}</view>
             <!-- 点击时间可回复 -->
             <view class="time" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}">{{item.fatherReplyDate}}</view>
           </view>
         </view>
         <!-- data-formId="{{item.formId}}" -->
         <!-- 点击内容可回复 -->
-        <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}"  data-commentdate="{{item.fatherReplyDate}}"> {{item.content}}</view>
+        <view class="comment-summary" bindtap="replay" data-id="{{item.id}}" data-name="{{item.nickName}}" data-userid="{{item.fatherUserID}}" data-commentdate="{{item.fatherReplyDate}}"> {{item.content}}</view>
 
         <!-- 子回复-->
         <view wx:for="{{item.sonList}}" wx:key="itemid1" wx:for-index="idx" wx:for-item="item1">
-          <view class="replay-user" bindtap="replay" data-id="{{item.id}}" data-name="{{item1.nickName}}" data-userid="{{item1.sonUserID}}"  data-commentdate="{{item1.sonReplyDate}}">
+          <view class="replay-user" bindtap="replay" data-id="{{item.id}}" data-name="{{item1.nickName}}" data-userid="{{item1.sonUserID}}" data-commentdate="{{item1.sonReplyDate}}">
             <text class="comment-username">{{item1.nickName}}</text>
             <text style="margin: 0 6rpx; color: #959595;">回复</text>
             <text class="comment-username">{{item1.receiverNick}}</text> ：{{item1.content}}
@@ -182,7 +178,7 @@
   <poster id="poster" hide-loading="{{false}}" preload="{{false}}" config="{{posterConfig}}" bind:success="onPosterSuccess" bind:fail="onPosterFail">
   </poster>
   <view class="ditail-copyright" style="display:{{display}}">
-    <template is="tempCopyright" data="{{blog:blog,webSiteName:webSiteName}}"/>
+    <template is="tempCopyright" data="{{blog:blog,webSiteName:webSiteName}}" />
   </view>
 
   <template is="login-popup" data="{{show: isLoginPopup, userInfo: userInfo}}"></template>
@@ -206,14 +202,14 @@
               <!-- 评论输入框和发送按钮 -->
               <view class="comment_input_box">
                 <input class="comment-input" type='text' confirm-type="send" cursor-spacing="10" maxlength="100" name="inputComment" value="{{content}}" placeholder="{{placeholder}}" focus="{{focus}}" bindblur="onReplyBlur" bindfocus="onRepleyFocus" />
-                <button class="comment-button touch-active" formType="submit"  >发送</button>
+                <button class="comment-button touch-active" formType="submit">发送</button>
               </view>
               <!-- 更多按钮 -->
               <!-- <image src="../../images/entry-more.png" class="comment_icon_more" catchtap="ShowHideMenu" mode=""></image> -->
 
             </view>
 
-            
+
 
             <!--功能图标-->
             <view class="menu-box {{isShow ? 'emoji-move-in' : 'emoji-move-out'}} {{isLoad ? 'no-emoji-move' : ''}}">
@@ -274,8 +270,34 @@
     </view>
   </view>
 
+  <!-- 作者信息展示弹窗 -->
+  <van-dialog use-slot title="发布者名片" show="{{ showAuthorCard }}" show-cancel-button bind:confirm="copyWxId" confirmButtonText="复制微信号" style="text-align: center; ">
+    <van-image src="{{authorInfo.wxAvatarUrl}}" width="400rpx" height="400rpx"  round
+ />
+    <van-cell-group style="text-align:left;">
+      <van-cell title="身份" value="{{authorInfo.role}}" />
+      <van-cell title="微信昵称" value="{{authorInfo.wxName}}" />
+      
+      <van-cell title="微信号" value="{{authorInfo.wxId}}" label="复制微信号可添加好友" />
+      
+    </van-cell-group>
+  </van-dialog>
+
+  <!-- 用户信息展示弹窗 -->
+  <van-dialog use-slot title="点赞小可爱名片" show="{{showUserCard}}" show-cancel-button bind:confirm="copyWxId" confirmButtonText="复制微信号" data-userInfo="{{likerInfo.wxId}}" style="text-align: center; ">
+    <van-image src="{{likerInfo.wxAvatarUrl}}" width="400rpx" height="400rpx"  round
+ />
+    <van-cell-group style="text-align:left;">
+      <van-cell title="身份" value="{{likerInfo.role}}" />
+      <van-cell title="微信昵称" value="{{likerInfo.wxName}}" />
+      
+      <van-cell title="微信号" value="{{likerInfo.wxId}}" label="复制微信号可添加好友" />
+      
+    </van-cell-group>
+  </van-dialog>
+
   <!-- 无法访问网络时 [js:395]showerror: 'block'; -->
-  <view class="showerror" style="display:{{showerror}}">    
+  <view class="showerror" style="display:{{showerror}}">
     <image src="../../images/cry80.png" style="height:100rpx;width:100rpx"></image>
     <!--  errMessage js页面data中没定义这个数据 -->
     <view class="errortext">{{errMessage}}</view>
