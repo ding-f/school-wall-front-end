@@ -187,8 +187,8 @@ Page({
     })
       .then(() => {
         // on confirm
-        let replyId=set.cid;
-        let from=set.from;
+        let replyId=set.cid;    //父级表评论的ID或子级表评论的ID
+        let from=set.from;    //false来自父级评论，true来自子级评论
 
         console.log("删除"+replyId + "来自" +from)
         
@@ -410,20 +410,21 @@ Page({
                   if (usermetaList)
                   {
                       self.setData({
-                          readLogs: usermetaList.filter(v=>{
-                            //剪贴显示年月日
-                            // v.date = util.cutstr(v.date, 10, 1);    //剪切字符串，为10个，1是不用加"..."
-                            count++;
-                            // 去除数组空元素
+                          readLogs: usermetaList
+                          // .filter(v=>{
+                          //   //剪贴显示年月日
+                          //   // v.date = util.cutstr(v.date, 10, 1);    //剪切字符串，为10个，1是不用加"..."
+                          //   count++;
+                          //   // 去除数组空元素
 
                             
-                            return v; 
-                          })
+                          //   return v; 
+                          // })
                       });
                       // console.log(usermetaList)
                   }
 
-                  if (count == 0) {
+                  if (usermetaList.length == 0) {
                       self.setData({
                           shownodata: 'block',
                           showList: 'none',
