@@ -16,7 +16,7 @@ var app = getApp();
 Page({
     data: {
         text: "Page topic",
-        categoriesList: {},
+        categoriesList: [],
         floatDisplay: "none",
         openid:"",
         userInfo:{},
@@ -49,13 +49,18 @@ Page({
 
     onShow:function(){            
       this.getTabBar().init();
+
+      var self=this;
+
+      Auth.checkLogin(self);    //检查Code是否过期
+      Auth.setUserInfoData(self); //为整个页面，setdata用户信息
+
+      self.fetchCategoriesData();
     },
 
     onPullDownRefresh: function(){
       var self = this;
-      // self.setData({
-      //   categoriesList : {},
-      // });
+      
       self.fetchCategoriesData();
 
     },
@@ -152,7 +157,8 @@ Page({
     postsub: function (e) {
         var self = this;
         if (!self.data.openid) {
-            Auth.checkSession(self,'isLoginNow');
+          //呼出登录对话框
+            Auth.checkSession(self,'isLoginNow'); 
         }
         else {
             var categoryid = e.currentTarget.dataset.id;
@@ -331,6 +337,7 @@ Page({
             }
         });
     },
+    //登录对话框点击同意登录
     agreeGetUser: function (e) {        
         let self= this;
         Auth.checkAgreeGetUser(e,app,self,'0');   

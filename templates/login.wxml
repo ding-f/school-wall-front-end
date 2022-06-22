@@ -1,5 +1,5 @@
 <template name="login">
-  <block wx:if="{{!userInfo.isLogin}}">
+  <block wx:if="{{true}}">
 
     <view class="login-inner">
       <image class="avatar" src="../../images/gravatar.png"></image>
@@ -11,16 +11,17 @@
     <view class="login-btn-box">
       <button class="login-btn" bindtap="closeLoginPopup">取消</button>
       <!-- <button class="login-btn" open-type="getUserInfo" bindgetuserinfo="agreeGetUser">确定</button> -->
+      <!-- agreeGetUser(当前页面函数)就是调用Auth.checkAgreeGetUser -->
         <button class="login-btn" bindtap="agreeGetUser">确定</button>
     </view>
 
   </block>
-  <block wx:else>
+  <!-- <block wx:else>
     <view class="login-inner">
       <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
       <view class="username">
         <text>{{userInfo.nickName}}</text>
       </view>
     </view>
-  </block>
+  </block> -->
 </template>

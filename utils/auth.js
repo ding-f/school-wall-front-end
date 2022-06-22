@@ -6,15 +6,15 @@ var app = getApp();
 
 const Auth = {}
 
-// mark: 检测当前用户是否已登录，失效登录弹出请求登录对话框 （需登录项加载）
+// mark: 失效登录弹出请求登录对话框
 Auth.checkSession = function (appPage, flag) {
   let openid = wx.getStorageSync('openid');
   if (!openid) {
-    if ('isLoginNow' == flag) { //作用是呼出登录对话框，点击登录调用本地函数checkAgreeGetUser
+    if ('isLoginNow' == flag) { //作用是呼出登录对话框，点击登录调用本地函数AgreeGetUser
       var userInfo = {
         avatarUrl: "../../images/gravatar.png",
         nickName: "登录",
-        isLogin: false
+        isLogin: false //false显示templates/login.wxml中的内容
       }
       appPage.setData({
         isLoginPopup: true,
@@ -26,14 +26,16 @@ Auth.checkSession = function (appPage, flag) {
 }
 
 // mark: 请求服务器，检查Session是否过期（需要登录权限页面的 onLoad 加载）【准备实现Shiro Session验证是否失效，如果失效重传JWT】
+// 无论是否过期都会去腾讯官网请求Code保存到Storage
 Auth.checkLogin = function (appPage) {
   let wxLoginInfo = wx.getStorageSync('wxLoginInfo');
   // wx.checkSession 接口检测当前用户登录态是否有效（微信官方）
   wx.checkSession({
     success: function () { //微信服务器的session_key未失效
-      if (!wxLoginInfo.js_code) //有可能被用户清楚了缓存
+      if (!wxLoginInfo.js_code) //有可能被用户清除了缓存
       {
         //查证UUID是否过期（过期重传Jwt）
+
         //wxLogin()封装了wx.login()
         Auth.wxLogin().then(res => {
           appPage.setData({
@@ -56,20 +58,31 @@ Auth.checkLogin = function (appPage) {
         });
         wx.setStorageSync('wxLoginInfo', res);
         console.log('checkSession_fail_wxLoginfo');
+
+        wx.showToast({
+          title: '请重新登陆',
+          icon: 'error',
+          mask: false,
+          duration: 1000
+        });
       });
+
+     
 
     }
   })
 }
 
 
-// mark: 点击同意登录【未过期就不进行JWT签证】
+// mark: 登录请求对话框，点击了同意登录，处理登陆【未过期就不进行JWT签证】
 Auth.checkAgreeGetUser = function (e, app, appPage, authFlag) {
   let wxLoginInfo = wx.getStorageSync('wxLoginInfo'); //Code
   if (wxLoginInfo.js_code) {
     Auth.agreeGetUser(e, wxLoginInfo, authFlag).then(res => {
+      // mark: ------- 抓取登录时概率错误 -------
+      // console.log(res.errcode);
       if (res.errcode == "") {
-        wx.setStorageSync('userInfo', res.userInfo); //昵称，头像
+        wx.setStorageSync('userInfo', res.userInfo); //昵称，头像,userID
         wx.setStorageSync('openid', res.openid); //openID
         wx.setStorageSync('userLevel', res.userLevel); //角色
         appPage.setData({
@@ -91,25 +104,28 @@ Auth.checkAgreeGetUser = function (e, app, appPage, authFlag) {
         appPage.setData({
           userInfo: userInfo
         });
-        wx.showModal({
-          title: '提示',
-          content: '登录失败,清除缓存重新登录?',
-          success(res) {
-            if (res.confirm) {
-              Auth.logout(appPage);
-              Auth.checkLogin(appPage); //推翻登录流程重头来
-              wx.reLaunch({
-                url: '../readlog/readlog'
-              });
+        if (res.errcode !== "用户拒绝了授权") {
+          wx.showModal({
+            title: '提示',
+            content: '登录失败,清除缓存重新登录?',
+            success(res) {
+              if (res.confirm) {
+                Auth.logout(appPage);
+                Auth.checkLogin(appPage); //推翻登录流程重头来
+                wx.reLaunch({
+                  url: '../readlog/readlog'
+                });
 
-            } else if (res.cancel) {
-              wx.reLaunch({
-                url: '../index/index'
-              });
+              } else if (res.cancel) {
+                
+                // wx.reLaunch({
+                //   url: '../index/index'
+                // });
+              }
             }
-          }
-        })
+          })
 
+        }
       }
       appPage.setData({
         isLoginPopup: false
@@ -122,6 +138,7 @@ Auth.checkAgreeGetUser = function (e, app, appPage, authFlag) {
     console.log("登录失败");
     wx.showToast({
       title: '登录失败',
+      icon: 'error',
       mask: false,
       duration: 1000
     });
@@ -205,8 +222,7 @@ Auth.checkAgreeGetUser = function (e, app, appPage, authFlag) {
 //                args.userInfo={isLogin:false};
 //                args.userSession="";            
 //                resolve(args);
-//             }
-//         }) 
+//             }//         }) 
 // }
 
 //弹窗内用户点击同意授权触发（将Code，头像，昵称传递给服务器，获取OpenID）
@@ -220,12 +236,12 @@ Auth.agreeGetUser = function (e, wxLoginInfo, authFlag) {
       mask: true
     })
     //首先请求了Code，微信服务器就知道该返回哪个用户的Profile信息
-    wx.getUserProfile({ //微信接口，生成用户信息（点击了授权就会获取到）
+    wx.getUserProfile({ //微信接口，生成用户信息（微信昵称、头像链接），点击了授权就会获取到
       lang: 'zh_CN',
       desc: '登录后信息展示',
       success: (res) => {
         wx.showToast({
-          title: '欢迎:'+res.userInfo.nickName,
+          title: '欢迎:' + res.userInfo.nickName,
           icon: 'success',
           duration: 1666
         })
@@ -233,7 +249,8 @@ Auth.agreeGetUser = function (e, wxLoginInfo, authFlag) {
         let userInfo = res.userInfo || {} //微信服务器传过来的用户信息
         wx.setStorageSync('userInfo', userInfo)
 
-        userInfo.isLogin = true;
+        userInfo.isLogin = false;
+        //昵称与头像链接
         args.avatarUrl = userInfo.avatarUrl;
         args.nickName = userInfo.nickName;
 
@@ -252,18 +269,45 @@ Auth.agreeGetUser = function (e, wxLoginInfo, authFlag) {
             // console.log(response.header.Authorization);
             wx.setStorageSync('authorization', response.header.Authorization);
             var userLevel = {};
-            if (response.data.data.role == "0") {
-              userLevel.level = "0";
-              userLevel.levelName = "AKU童鞋";
+            // if (response.data.data.role == "0") {
+            //   userLevel.level = "0";
+            //   userLevel.levelName = "AKU童鞋";
 
-            } else {
-              userLevel = response.data.data.role;
-            }
+            // } else {
+            //   userLevel = response.data.data.role;
+            // }
+
+            var roleNum = response.data.data.role;
+            userLevel.level = roleNum;
+
+            switch (roleNum) {
+              case '0':
+                userLevel.levelName = "小可爱";
+                // console.log("小可爱");
+                break;
+              case '1':
+                // console.log("管理员");
+                userLevel.levelName = "管理员";
+                break;
+              case '2':
+                // console.log("老师");
+                userLevel.levelName = "老师";
+                break;
+              case '9':
+                // console.log("铸鼎_");
+                userLevel.levelName = "铸鼎_";
+                break;
+
+              default: //上述条件都不满足时，默认执行的代码
+                userLevel.levelName = "游客";
+                console.log("游客");
+            };
+
             data.userLevel = userLevel;
             data.errcode = "";
-            data.userId = response.data.data.id;
+            data.userInfo.userId = response.data.data.id;
 
-
+            // console.log(response);
 
             resolve(data);
 

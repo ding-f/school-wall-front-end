@@ -14,18 +14,19 @@
     <view class='userinfo_des_box'>
       <!-- 角色 -->
       <view class="userinfo_role" decode="{{true}}">
-        {{openid !='' ? userLevel.levelName : '角色'}}
+        {{openid !='' ? userLevel.levelName : '游客'}}
       </view>
       <!-- 更新信息按钮 -->
       <!-- <view class="btn-exit"  catchtap="refresh" wx:if="{{openid !=''}}">
       更新信息
         
       </view> -->
-      <view class="btn-exit" catchtap="refreshlive" wx:if="{{openid !='' && userLevel.level =='10'}}">
+      
+      <!-- <view class="btn-exit" catchtap="refreshlive" wx:if="{{openid !='' && userLevel.level =='10'}}">
         更新直播
-      </view>
+      </view> -->
       <!-- 退出登录按钮 -->
-      <view class="btn-exit" catchtap="exit">{{openid !='' ? '退出登录' : '清除缓存'}}</view>
+      <view class="btn-exit" catchtap="exit" data-exit="{{openid !='' ? true : false}}">{{openid !='' ? '退出登录' : '清缓存'}}</view>
     </view>
 
     <block wx:if="{{openid !=''}}">
@@ -63,8 +64,7 @@
       <text style="color: tomato;"> [长按删除]</text>
       </view>
 
-      
-      
+
       </van-collapse-item>
     </block>
   </van-collapse>

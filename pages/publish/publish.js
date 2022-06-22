@@ -23,15 +23,23 @@ Page({
 
     title: '',
     content: '',
-    selectedCate: {id: 1, name: "校园生活", subname: "爱校园，爱生活~"},
+    selectedCate: {
+      id: 1,
+      name: "校园生活",
+      subname: "爱校园，爱生活~"
+    },
     pictureList: [],
     upNameArr: [],
 
-    categoriesList: [
-          { name: '访问错误，请联系开发者。', color: '#ee0a24' },
-          { loading: true },
+    categoriesList: [{
+        name: '访问错误，请联系开发者。',
+        color: '#ee0a24'
+      },
+      {
+        loading: true
+      },
 
-        ],
+    ],
     showCateSheet: false,
     arrowDirection: "left",
 
@@ -48,17 +56,17 @@ Page({
     Auth.checkLogin(self); //检查微信服务器session_key是否有效，session无效||code丢失 重新设置code信息
 
     var getAddPostCateList = wxRequest.getRequest(Api.getAddPostCateList());
-    getAddPostCateList.then(response =>{
-      var listCate=response.data.data;
+    getAddPostCateList.then(response => {
+      var listCate = response.data.data;
 
       //[JS高效更改对象中属性名](https://blog.csdn.net/corey_mengxiaodong/article/details/80238615)
-      listCate = JSON.parse(JSON.stringify(listCate).replace(/description/g,"subname"));
+      listCate = JSON.parse(JSON.stringify(listCate).replace(/description/g, "subname"));
       // console.log(listCate)
-      if(response.data.code===200){
+      if (response.data.code === 200) {
         this.setData({
           categoriesList: listCate
         });
-      }else{
+      } else {
         // this.setData({
         //   categoriesList: [
         //     { name: '访问错误', color: '#ee0a24' },
@@ -67,7 +75,7 @@ Page({
         //   ]
         // });
       }
-      
+
       // console.log(listCate)
     });
   },
@@ -77,7 +85,7 @@ Page({
    */
   onReady() {
     let self = this;
-    Auth.checkSession(self, 'isLoginNow');  //弹出LoginPopup，显示用户信息
+    Auth.checkSession(self, 'isLoginNow'); //弹出LoginPopup，显示用户信息
 
   },
 
@@ -194,15 +202,16 @@ Page({
 
   // mark: 发布按钮点击事件 
   formSubmit: function (e) {
-    let self=this;
+    let self = this;
     var postTitle = e.detail.value.post_title;
     var postContent = e.detail.value.post_content;
-    var cateObj=self.data.selectedCate;
+    var cateObj = self.data.selectedCate;
     var authJwt = wx.getStorageSync('authorization');
     //提交内容
     var selectedPhotoList = self.data.pictureList;
 
     var upNameList = self.data.upNameArr;
+
 
 
     if (postTitle === null || postTitle === "") {
@@ -216,101 +225,108 @@ Page({
     }
 
 
-  const beforeClose = (action) => new Promise((resolve) => {
-    setTimeout(() => {
-      if (action === 'confirm') {
-        resolve(true);
+    const beforeClose = (action) => new Promise((resolve) => {
+      setTimeout(() => {
+        if (action === 'confirm') {
+          resolve(true);
 
-    //文件服务器链接
-    var addImageUrl = Api.postAdd();
-    // let dataTrans={}
+          //文件服务器链接
+          var addImageUrl = Api.postAdd();
+          // let dataTrans={}
 
-      var arr = [];
-      selectedPhotoList.map(function (v, k) {
+          var arr = [];
+          selectedPhotoList.map(function (v, k) {
 
-        wx.uploadFile({
-          //后端提交文件接口
-          url: addImageUrl,
-          //请求体form-data，key=file
-          name: 'file',
-          //本地资源路径
-          filePath: v.url,
-          // 请求头token 
-          formData: {
-            Authorization: authJwt
-          },
-          success(res) {
-            let img = res.data;
-            // console.log(img)
-            arr.push(img.toString()); //返回图片的路径  并追加到新数组里面
-          },
-          fail(err){
-  
-          },
-          complete(res){
-            
-          }
-  
-        })
-  
-      })
-      
-    this.setData({
-      upNameArr: arr //在这里重新赋值
+            wx.uploadFile({
+              //后端提交文件接口
+              url: addImageUrl,
+              //请求体form-data，key=file
+              name: 'file',
+              //本地资源路径
+              filePath: v.url,
+              // 请求头token 
+              formData: {
+                Authorization: authJwt
+              },
+              success(res) {
+                let img = res.data;
+                // console.log(img)
+                arr.push(img.toString()); //返回图片的路径  并追加到新数组里面
+              },
+              fail(err) {
+
+              },
+              complete(res) {
+
+              }
+
+            })
+
+          })
+
+          this.setData({
+            upNameArr: arr //在这里重新赋值
+          });
+
+          setTimeout(function () {
+            let postData = {
+              title: postTitle,
+              content: postContent,
+              categoryId: cateObj.id,
+              postImage0: arr[0],
+              postImage1: arr[1],
+              postImage2: arr[2],
+              postImage3: arr[3],
+              postImage4: arr[4],
+              postImage5: arr[5],
+              postImage6: arr[6],
+              postImage7: arr[7],
+              postImage8: arr[8]
+
+              // photoList : arr
+            };
+
+            let addurl = Api.postAddPost();
+            var postAddRequest = wxRequest.postRequest(addurl, postData, authJwt);
+
+            postAddRequest.then(res => {
+              console.log(res)
+
+            });
+            wx.reLaunch({
+              url: '../index/index',
+            })
+
+          }, 1000); //等待9秒后文件服务器才能返回全部图片名称，再等待1秒写入信息到数据库,并返回主页
+
+
+        } else {
+
+          // 拦截取消操作
+          resolve(false);
+
+        }
+      }, 9000); //图片上传给9秒时间
     });
-     
-    setTimeout(function () {
-      let postData = {
-        title : postTitle,
-        content : postContent,
-        categoryId : cateObj.id,
-        postImage0 : arr[0],
-        postImage1 : arr[1],
-        postImage2 : arr[2],
-        postImage3 : arr[3],
-        postImage4 : arr[4],
-        postImage5 : arr[5],
-        postImage6 : arr[6],
-        postImage7 : arr[7],
-        postImage8 : arr[8]
-  
-        // photoList : arr
-      };
-  
-      let addurl=Api.postAddPost();
-      var postAddRequest = wxRequest.postRequest(addurl, postData ,authJwt);
-  
-      postAddRequest.then(res => {
-        console.log(res)
-  
+    var openId = wx.getStorageSync('openid');
+    // console.log(openId)
+    if (openId != null && openId != "") {
+      Dialog.confirm({
+        title: '墙贴即将发布',
+        message: '墙君将刻出你的文案，渲染美丽的图片，等待10秒 ？',
+
+        confirmButtonText: "确认发布",
+
+        closeOnClickOverlay: true,
+        showCancelButton: false,
+        beforeClose
       });
-      wx.reLaunch({
-        url: '../index/index',
+    }else{
+      self.setData({
+        isLoginPopup: true
       })
-
-  },1000);    //等待9秒后文件服务器才能返回全部图片名称，再等待1秒写入信息到数据库,并返回主页
-
-        
-      } else {
-        
-        // 拦截取消操作
-        resolve(false);
-        
-      }
-    }, 9000); //图片上传给9秒时间
-  });
-
-  Dialog.confirm({
-    title: '墙贴即将发布',
-    message: '墙君将刻出你的文案，渲染美丽的图片，等待10秒 ？',
-    
-    confirmButtonText : "确认发布",
-
-closeOnClickOverlay : true,
-showCancelButton: false,
-beforeClose
-  });
-  // console.log("异步测试")
+    }
+    // console.log("异步测试")
   },
 
   closeLoginPopup() {
@@ -320,25 +336,24 @@ beforeClose
     });
     //返回主页
     wx.reLaunch({
-          url: '../index/index'
-        });
+      url: '../index/index'
+    });
 
   },
-  
+
   openLoginPopup() {
     this.setData({
       isLoginPopup: true
     });
   },
-  agreeGetUser:function(e)
-  {
-    let self= this;
-    
-    Auth.checkAgreeGetUser(e,app,self,'0');
+  agreeGetUser: function (e) {
+    let self = this;
+
+    Auth.checkAgreeGetUser(e, app, self, '0');
   },
 
   clickCateCell() {
-    this.setData({ 
+    this.setData({
       showCateSheet: true,
       arrowDirection: "up"
     });
@@ -346,7 +361,7 @@ beforeClose
 
   //点击遮罩层关闭列表
   onClose() {
-    this.setData({ 
+    this.setData({
       showCateSheet: false,
       arrowDirection: "left"
     });
@@ -355,9 +370,9 @@ beforeClose
   // mark: 选择列表项触发反馈信息
   onSelect(event) {
     // console.log(event.detail);
-    let self= this;
+    let self = this;
     self.setData({
-      selectedCate:event.detail
+      selectedCate: event.detail
     })
 
   },

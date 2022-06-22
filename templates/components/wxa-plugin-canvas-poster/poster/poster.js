@@ -3,7 +3,7 @@ const defaultOptions = {
 };
 
 function Poster(options = {}) {
-    options = {
+    options = { 
         ...defaultOptions,
         ...options,
     };

@@ -1,4 +1,5 @@
 import config from '../../utils/config.js'
+import Dialog from '../../miniprogram_npm/@vant/weapp/dialog/dialog';
 var Api = require('../../utils/api.js');
 var util = require('../../utils/util.js');
 var Auth = require('../../utils/auth.js'); //登录模块
@@ -27,6 +28,7 @@ import Poster from '../../templates/components/wxa-plugin-canvas-poster/poster/p
 
 Page({
   data: {
+    
     title: '帖子内容', //微信内部数据调用浏览标签
     webSiteName: webSiteName,
     wxId:"",
@@ -109,8 +111,10 @@ Page({
     fristOpen: false,
     blog: blog,
     // detailSummaryHeight: '',    //设置广告高度
-    platform: '' //执行生命周期开始时候识别手机平台
+    platform: '' ,//执行生命周期开始时候识别手机平台
 
+    qrTxt: '',
+    qrImage: '',
   },
 
 
@@ -157,7 +161,7 @@ Page({
   // mark: 展示点赞
   showLikeImg: function () {
     var self = this;
-    // mark: ####Bug####
+    
     // var flag = false;
     var _likes = self.data.detail.postLikers; // mark: 142 获取点赞头像链接
     if (_likes.length==0) {
@@ -433,6 +437,7 @@ Page({
   //     });
   // },
 
+  // mark: --------- 待优化 ---------
   // 用户身份展示
   identityShow: function(user){
     switch (user.role) {
@@ -490,7 +495,12 @@ Page({
         var resData = response.data.data;
         //设置身份信息
         var aut = resData.author;
-        self.identityShow(aut);
+        // self.identityShow(aut);
+
+        //获取LocalStorage数据，将权限数改为名称
+        var roleInfo=wx.getStorageSync('userLevel');
+        aut.role=roleInfo.levelName;
+
         // console.log(resData)
         let postdate = resData.date;
         var cutdate = util.cutstr(postdate, 10, 1)
@@ -1216,6 +1226,70 @@ Page({
 
     }
 
+  },
+
+  //长按评论触发删除
+  longPressComment:function(e){
+     var self=this;
+    // console.log(e)
+    var longPresSet=e.target.dataset;
+    let myInfo = wx.getStorageSync('userInfo');
+    //判断是不是自己的评论，如果是才可以进行执行删除
+    if(myInfo.userId===longPresSet.userid){
+      // console.log("执行删除评论～～～")
+      Dialog.confirm({
+        title: '确认删除此评论？',
+        message: longPresSet.content,
+      }).then(() => {
+        // on confirm
+        
+        let replyId=longPresSet.id;    //父级表评论的ID或子级表评论的ID
+        let from=longPresSet.commentType;    //false来自父级评论，true来自子级评论
+
+        //如果是子评论就将评论ID换成子评论的ID
+        if(from){
+          replyId=longPresSet.sid;
+        }
+        // console.log(myInfo)
+
+        var data={
+          userId: myInfo.userId,
+          replyId: replyId,
+          from: longPresSet.commentType,
+          
+        };
+
+        // console.log(myInfo.userId)
+
+        var url = Api.delMyComment();
+        var authJwt=wx.getStorageSync('authorization');
+
+        var delComment =  wxRequest.deleteRequest(url, data, authJwt);
+
+        delComment.then(res => {
+          console.log(res);
+          
+          if(res.data.code==200){
+            
+            wx.showToast({  //评论成功，下拉看看吧
+              title: res.data.msg,
+              mask: true,
+              icon: "none",
+              duration: 3000
+            });
+
+            self.fristOpenComment(); //刷新评论列表
+          }
+          
+        })
+
+
+      })
+      .catch(() => {
+        // on cancel
+      });
+
+    }
 
   },
 
@@ -1342,7 +1416,7 @@ Page({
 
               });
 
-              wx.showToast({
+              wx.showToast({  //评论成功，下拉看看吧
                 title: res.data.msg,
                 mask: false,
                 icon: "none",
@@ -1397,10 +1471,10 @@ Page({
             return res;
           }).then(res => {
 
-            console.log(res);
+            // console.log(res);
             if (res.data.code == '200' && res.data.data == true) {
 
-              self.fristOpenComment(); //
+              self.fristOpenComment(); //刷新评论列表
             }
 
           }).catch(response => {
@@ -1421,11 +1495,10 @@ Page({
 
   },
 
-
   // mark: 点击登录
   agreeGetUser: function (e) {
     let self = this;
-    Auth.checkAgreeGetUser(e, app, self, '0');;
+    Auth.checkAgreeGetUser(e, app, self, '0');    //加载Auth.agreeGetUser(e, wxLoginInfo, authFlag)
 
   },
   closeLoginPopup() {
@@ -1489,23 +1562,32 @@ Page({
     })
   },
 
+  onLoadQr(e) {
+    var self=this;
+    
+    console.info('二维码加载成功~~,文件地址:', e.detail)
+
+    this.setData({
+      qrImage: e.detail
+    });
+  },
+
   // mark: 1182 创建帖子海报
   creatArticlePoster: function (appPage, api, util, modalView, poster) {
+    // var self=this;
+
     var postId = appPage.data.detail.id;
-    var title = appPage.data.detail.title.rendered;
-    var excerpt = appPage.data.detail.excerpt.rendered ? appPage.data.detail.excerpt.rendered : '';
-    if (excerpt && excerpt.length != 0 && excerpt != '') {
-      excerpt = util.removeHTML(excerpt);
-    }
+    var title = appPage.data.detail.title;
+    var excerpt = '';
     var postImageUrl = ""; //海报图片地址
     var posterImagePath = "";
     var qrcodeImagePath = ""; //二维码图片的地址
     var flag = false;
     var imageInlocalFlag = false;
-    var downloadFileDomain = appPage.data.downloadFileDomain;
+    var downloadFileDomain = appPage.data.downloadFileDomain;   //图片下载主机列表
     // var logo = appPage.data.logo;
-    var defaultPostImageUrl = appPage.data.detail.postImageUrl;
-    var postImageUrl = appPage.data.detail.post_full_image;
+    var defaultPostImageUrl = appPage.data.detail.postImage0;   //帖子上传图片列表
+    var postImageUrl = appPage.data.detail.post_full_image;   //页面首图（海报封面）
 
 
     //获取帖子首图临时地址，若没有就用默认的图片,如果图片不是request域名，使用本地图片
@@ -1524,14 +1606,14 @@ Page({
 
       }
 
-    } else {
+    } else {  //没有设置海报封面，准备设置成 胡图图
       postImageUrl = defaultPostImageUrl;
     }
 
-    if (!postImageUrl) {
+    if (!postImageUrl) {  //帖子未上传任何图片
 
       wx.showToast({
-        title: '帖子没有图片且插件未设置默认海报封面图',
+        title: '墙贴没有图片且插件未设置默认海报封面图',
         icon: 'none',
         duration: 3000,
         success: function () {}
@@ -1620,17 +1702,23 @@ Page({
 
     posterConfig.blocks = blocks; //海报内图片的外框
     posterConfig.texts = texts; //海报的文字
-    var url = Api.creatPoster();
+    // var url = Api.creatPoster();
     var path = "pages/detail/detail?id=" + postId;
-    var data = {
-      postid: postId,
-      path: path
+    // var data = {
+    //   postid: postId,
+    //   path: path
 
-    };
-    var creatPosterRequest = wxRequest.postRequest(url, data);
-    creatPosterRequest.then(res => {
-      if (res.data.code == 'success') {
-        qrcodeImagePath = res.data.qrcodeimgUrl;
+    appPage.setData({
+      qrTxt: path
+    });
+    // };
+    // var creatPosterRequest = wxRequest.postRequest(url, data);
+    // creatPosterRequest.then(res => {
+
+    console.log(appPage.data.qrImage)
+      
+      if (appPage.data.qrImage!=='') {
+        qrcodeImagePath = appPage.data.qrImage;
 
 
         var images = [{
@@ -1653,7 +1741,7 @@ Page({
             height: 220,
             x: 92,
             y: 1020,
-            url: qrcodeImagePath, //二维码的图
+            url: postImageUrl, //二维码的图
           }
         ];
 
@@ -1666,12 +1754,12 @@ Page({
 
       } else {
         wx.showToast({
-          title: res.message,
+          title: "加载失败",
           mask: true,
           duration: 2000
         });
       }
-    });
+    // });
   },
 
   // mark: 广告错误log打印模块

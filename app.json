@@ -55,5 +55,9 @@
   },
   "plugins": {},
   "sitemapLocation": "sitemap.json",
-  "resizable": false
+  "resizable": false,
+  "usingComponents": {
+    "qr-container": "wx-qr"
+  }
+
 }

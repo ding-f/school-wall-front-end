@@ -7,6 +7,7 @@ var Api = require('../../utils/api.js');
 var util = require('../../utils/util.js');
 
 var wxApi = require('../../utils/wxApi.js')
+var Auth = require('../../utils/auth.js');
 var wxRequest = require('../../utils/wxRequest.js')
 import config from '../../utils/config.js'
 // const Adapter = require('../../utils/adapter.js') //帖子列表间隙广告
@@ -130,6 +131,8 @@ Page({
   
   onLoad: function (options) {
     var self = this;
+    Auth.checkLogin(self);    //检查Code是否过期
+    Auth.setUserInfoData(self); //为整个页面，setdata用户信息
     wx.showShareMenu({
               withShareTicket:true,
               menus:['shareAppMessage','shareTimeline'],
@@ -185,20 +188,22 @@ Page({
     this.getTabBar().init();
     wx.setStorageSync('openLinkCount', 0);
 
-    var nowDate = new Date();
-    nowDate = nowDate.getFullYear()+"-"+(nowDate.getMonth() + 1)+'-'+nowDate.getDate();
-    nowDate= new Date(nowDate).getTime();   
-    var _openAdLogs =wx.getStorageSync('openAdLogs')|| [];
-    var openAdLogs=[];
-    _openAdLogs.map(function (log) {   
-      if(new Date(log["date"]).getTime() >= nowDate)  //广告租期大于现在的时间，表示广告不过期
-      {
-        openAdLogs.unshift(log);    //写入广告的数组
-      }
+   
+
+    // var nowDate = new Date();
+    // nowDate = nowDate.getFullYear()+"-"+(nowDate.getMonth() + 1)+'-'+nowDate.getDate();
+    // nowDate= new Date(nowDate).getTime();   
+    // var _openAdLogs =wx.getStorageSync('openAdLogs')|| [];
+    // var openAdLogs=[];
+    // _openAdLogs.map(function (log) {   
+    //   if(new Date(log["date"]).getTime() >= nowDate)  //广告租期大于现在的时间，表示广告不过期
+    //   {
+    //     openAdLogs.unshift(log);    //写入广告的数组
+    //   }
     
-    })
+    // })
     
-    wx.setStorageSync('openAdLogs',openAdLogs); //写入数组到本地
+    // wx.setStorageSync('openAdLogs',openAdLogs); //写入数组到本地
     // console.log(wx.getStorageSync('openAdLogs'));
 
   },

@@ -1,4 +1,4 @@
-<template name="tempCopyright">
+<template name="tempCopyright" >
 <view>  © {{webSiteName}} </view>
 <view> 欢迎访问我的博客[铸鼎_]：{{blog}} </view>
 </template>

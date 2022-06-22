@@ -58,7 +58,15 @@ function getRequest(url, data,authJwt='') {
  * data 以对象的格式传入
  */
 function postRequest(url, data, authJwt='') {
+  //其中会有3个重名“postRequest”，意思是： postRequest(url, data, authJwt='')将调用者对参数传递给return postRequest，它友回将数据传递给wx.request，最终将结果返回给被调用者。
+
+  // wx.request({
+  //   url: 'url',
+  // })
     var postRequest = wxPromisify(wx.request);
+
+  
+
     wx.showNavigationBarLoading();
 
     return postRequest({
@@ -72,7 +80,24 @@ function postRequest(url, data, authJwt='') {
     })
 }
 
+function deleteRequest(url, data, authJwt=''){
+  var deleteRequest = wxPromisify(wx.request);
+  wx.showNavigationBarLoading();
+
+  return deleteRequest({
+    url: url,
+    method: 'DELETE',
+    data: data,
+    header :{
+      "content-type": "application/json",
+      "Authorization": authJwt
+    },
+  })
+
+}
+
 module.exports = {
     postRequest: postRequest,
-    getRequest: getRequest
+    getRequest: getRequest,
+    deleteRequest: deleteRequest
 }
