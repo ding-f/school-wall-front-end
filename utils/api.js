@@ -229,7 +229,7 @@ module.exports = {
     return url + 'comment/reply'
   }, 
 
-  //获取微信评论（已实现）
+  //获取我的微信评论（已实现）
   getWeixinComment: function () {
       var url = HOST_URI;
       return url + 'my/comments';
@@ -238,7 +238,7 @@ module.exports = {
   //删除我的评论
   delMyComment: function(){
     var url = HOST_URI;
-    return url + 'delete/my/like';
+    return url + 'delete/my/comment';
   },
 
   //获取帖子的第一个图片地址,如果没有给出默认图片

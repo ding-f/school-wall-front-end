@@ -173,10 +173,12 @@
     <!-- 提交评论为null弹出对话框模块 -->
     <modal title="{{dialog.title}}" hidden="{{dialog.hidden}}" no-cancel bindconfirm="confirm">{{dialog.content}}</modal>
   </view>
-  <template is="modalView" data="{{...__modalView__}}" />
 
+  <!-- 海报弹出框 -->
+  <template is="modalView" data="{{...__modalView__}}" />
   <poster id="poster" hide-loading="{{false}}" preload="{{false}}" config="{{posterConfig}}" bind:success="onPosterSuccess" bind:fail="onPosterFail">
   </poster>
+
   <view class="ditail-copyright" style="display:{{display}}">
     <template is="tempCopyright" data="{{blog:blog,webSiteName:webSiteName}}" />
   </view>
@@ -305,5 +307,6 @@
     <!--  errMessage js页面data中没定义这个数据 -->
     <view class="errortext">{{errMessage}}</view>
   </view>
-  <qr-container style="display: none;" bindload="onLoadQr" text="{{qrTxt}}" ></qr-container>
+
 </view>
+<qr-container bindload="onLoadQr" text="{{qrTxt}}" ></qr-container>

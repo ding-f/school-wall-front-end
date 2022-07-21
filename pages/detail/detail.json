@@ -2,7 +2,7 @@
     "enablePullDownRefresh": false,
     "backgroundTextStyle": "dark",
     "usingComponents": {
-        "poster": "../../templates/components/wxa-plugin-canvas-poster/poster/index",
+        "poster": "../../templates/components/wxa-plugin-canvas-poster/poster",
         "mp-html": "/components/mp-html/index",
         "van-icon": "@vant/weapp/icon/index",
         "van-button": "@vant/weapp/button/index",

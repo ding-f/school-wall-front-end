@@ -287,7 +287,7 @@ const helper = {
      */
     _downImage(imageUrl) {
         return new Promise((resolve, reject) => {
-            if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
+            if (/^http/.test(imageUrl) && !/tmp/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
                 wx.downloadFile({
                     url: this._mapHttpToHttps(imageUrl),
                     success: (res) => {

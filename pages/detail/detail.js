@@ -17,6 +17,7 @@ const replyCount = config.getReplyCount;
 var webSiteName = config.getWebsiteName;
 var blog = config.getBlog;
 
+
 import {
   ModalView
 } from '../../templates/modal-view/modal-view.js'
@@ -48,7 +49,8 @@ Page({
     commentsList: [],
     // ChildrenCommentsList: [],
     commentCount: 0, //设置评论的数目
-    detailDate: '',
+    detailDate: '',   //全格式时间
+    cutDate: '',    //剪切时间 年-月-日
     commentValue: '',
     display: 'none', // 设置帖子、猜你喜欢、评论、等css样式
     showerror: 'none', // 设置显示的css样式，error：block   默认：none
@@ -114,12 +116,13 @@ Page({
     platform: '' ,//执行生命周期开始时候识别手机平台
 
     qrTxt: '',
-    qrImage: '',
+    qrImage: 'https://thirdwx.qlogo.cn/mmopen/vi_32/Ne1NOq8ScicXNY7U8qtbU4JXAGNKOuibrrRKDRHxHvPcR5EoD0K2cDIU1Xyk16yUdcKON61RRTRt0SianCegtsYzg/132',
   },
 
 
   // mark: 此处获取其他页面传过来的数据并后台准备数据的加载
   onLoad: function (options) {
+    
     var self = this;
     wx.showShareMenu({ // mark: 转发帖子菜单
       withShareTicket: true,
@@ -529,6 +532,7 @@ Page({
           userId: aut.id,
           wxName: aut.wxName,
           date: resData.date
+          
         }); //加上现在获取到的[id,标题]
         wx.setStorageSync('readLogs', logs); //将这个数组覆盖掉
 
@@ -580,7 +584,7 @@ Page({
           authorID: resData.author.id, //文章作者ID
           likeCount: _likeCount, //设置点赞数
           postID: resData.id, //设置帖子Id
-
+          cutDate: cutdate,   //剪切时间年-月-日
           detailDate: postdate, //帖子的发布时间
           display: 'block', //显示帖子
           displayLike: _displayLike, //如果有喜欢数，把喜欢数设置出显示效果
@@ -1526,7 +1530,7 @@ Page({
   },
   onPosterFail(err) {
     wx.showToast({
-      title: err,
+      title: '生成海报失败',
       mask: true,
       duration: 2000
     });
@@ -1541,7 +1545,6 @@ Page({
       Auth.checkSession(self, 'isLoginNow'); //创建海报未登录，请求登录
 
     }
-
   },
 
   showModal: function (posterPath) {
@@ -1576,38 +1579,46 @@ Page({
   creatArticlePoster: function (appPage, api, util, modalView, poster) {
     // var self=this;
 
+    console.log(appPage.data.detail);
+
     var postId = appPage.data.detail.id;
     var title = appPage.data.detail.title;
-    var excerpt = '';
+    var cutdate = appPage.data.cutDate;
+    var excerpt = "excerpt";
     var postImageUrl = ""; //海报图片地址
-    var posterImagePath = "";
+    // var posterImagePath = "";
     var qrcodeImagePath = ""; //二维码图片的地址
-    var flag = false;
+    // var flag = false;
     var imageInlocalFlag = false;
-    var downloadFileDomain = appPage.data.downloadFileDomain;   //图片下载主机列表
+    // var downloadFileDomain = appPage.data.downloadFileDomain;   //图片下载主机列表
     // var logo = appPage.data.logo;
-    var defaultPostImageUrl = appPage.data.detail.postImage0;   //帖子上传图片列表
-    var postImageUrl = appPage.data.detail.post_full_image;   //页面首图（海报封面）
+    var defaultErrorImage="../../../../images/error.jpg";
+    var defaultPostImageUrl = appPage.data.detail.postImage0;   //帖子上传第一个图
+    let image0url = Api.imagesDownLoad(cutdate, defaultPostImageUrl);   //帖子上传第一张图的URL
+    // var postImageUrl = appPage.data.detail.post_full_image;   //页面首图（海报封面）
+    
 
 
     //获取帖子首图临时地址，若没有就用默认的图片,如果图片不是request域名，使用本地图片
-    if (postImageUrl) {
-      var n = 0;
-      for (var i = 0; i < downloadFileDomain.length; i++) {
+    if (defaultPostImageUrl=="../../images/error.jpg" ) {
+      // var n = 0;
+      // for (var i = 0; i < downloadFileDomain.length; i++) {
 
-        if (postImageUrl.indexOf(downloadFileDomain[i]) != -1) {
-          n++;
-          break;
-        }
-      }
-      if (n == 0) {
-        imageInlocalFlag = true;
-        postImageUrl = defaultPostImageUrl;
+      //   if (postImageUrl.indexOf(downloadFileDomain[i]) != -1) {
+      //     n++;
+      //     break;
+      //   }
+      // }
+      // if (n == 0) {
+        //没有设置封面图
+        // imageInlocalFlag = true;
+        postImageUrl = defaultErrorImage;
 
-      }
+      // }
 
-    } else {  //没有设置海报封面，准备设置成 胡图图
-      postImageUrl = defaultPostImageUrl;
+    } else {  
+      //有封面图
+      postImageUrl = image0url;
     }
 
     if (!postImageUrl) {  //帖子未上传任何图片
@@ -1621,7 +1632,7 @@ Page({
       return;
 
     }
-    var posterConfig = {
+    var posterConfig = {    //背板
       width: 750,
       height: 1200,
       backgroundColor: '#fff',
@@ -1711,13 +1722,14 @@ Page({
     appPage.setData({
       qrTxt: path
     });
+
     // };
     // var creatPosterRequest = wxRequest.postRequest(url, data);
     // creatPosterRequest.then(res => {
 
     console.log(appPage.data.qrImage)
       
-      if (appPage.data.qrImage!=='') {
+      if (appPage.data.qrImage!='') {
         qrcodeImagePath = appPage.data.qrImage;
 
 
@@ -1741,11 +1753,13 @@ Page({
             height: 220,
             x: 92,
             y: 1020,
-            url: postImageUrl, //二维码的图
+            url: qrcodeImagePath, //二维码的图
           }
         ];
 
         posterConfig.images = images; //海报内的图片
+
+        console.log(posterConfig)
         appPage.setData({
           posterConfig: posterConfig
         }, () => {
@@ -1754,7 +1768,7 @@ Page({
 
       } else {
         wx.showToast({
-          title: "加载失败",
+          title: '加载失败',
           mask: true,
           duration: 2000
         });

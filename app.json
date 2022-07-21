@@ -58,6 +58,6 @@
   "resizable": false,
   "usingComponents": {
     "qr-container": "wx-qr"
-  }
+  } 
 
 }
