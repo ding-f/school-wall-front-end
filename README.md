@@ -1,7 +1,7 @@
 # school_wall（前端）
 
 #### 介绍
-个人作品： 安康学院校园墙-前端（小程序）
+个人作品： 安康学院校园墙-前后端（小程序前端）
 
 参照 微慕小程序开源版-WordPress版微信小程序，详见开源项目：https://github.com/iamxjb/winxin-app-watch-life.net
 
