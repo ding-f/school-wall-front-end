@@ -5,6 +5,8 @@
 
 参照 微慕小程序开源版-WordPress版微信小程序，详见开源项目：https://github.com/iamxjb/winxin-app-watch-life.net
 
+项目技术笔记：https://ding-f.gitee.io/2022/02/13/java-bi-ye-she-ji-kai-fa-bi-ji.html
+
 欢迎大家参观我的私人博客：https://ding-f.gitee.io/
 
 #### 软件架构
