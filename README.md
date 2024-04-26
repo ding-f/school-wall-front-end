@@ -6,4 +6,4 @@
 
 项目开发笔记：https://ding-f.gitee.io/2022/02/13/java-bi-ye-she-ji-kai-fa-bi-ji.html
 
-我的私人博客：https://ding-f.gitee.io/
+我的私人博客：https://ding-f.github.io/
